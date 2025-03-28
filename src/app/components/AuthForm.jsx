@@ -1,5 +1,7 @@
 'use client'
-import { useState } from "react"
+import { useState } from "react";
+import { supabase } from "../utils/supabaseClient.js";
+
 export default function AuthForm() {
     const [isNewUser, setIsNewUser] = useState(false)
     const [email, setEmail] = useState('')
