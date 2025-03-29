@@ -1,3 +1,5 @@
+import SignOutButton from "../components/SignOutButton";
+
 export default function Dashboard() {
     return (
         <main className="min-h-screen bg-gray-800 text-white relative p-10">
@@ -8,6 +10,7 @@ export default function Dashboard() {
             </div>
             <div>
                 {/* SignOutButton */}
+                <SignOutButton />
             </div>
         </main>
     )
