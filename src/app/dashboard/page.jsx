@@ -11,17 +11,17 @@ export default function Dashboard({ user, progress, xp, weekBadge, avatarUrl }) 
             <header className="flex justify-between items-center">
                 <div>
                     <p className="text-sm">{user?.email || "Utilisateur inconnu"}</p>
-                    <p className="text-lg font-bold">{progress?.completed || 0}/{progress?.total || 180} jours</p>
+                    <p className="text-lg font-bold"> jours</p>
                 </div>
                 <div className="bg-yellow-400 text-black px-3 py-1 rounded-full font-bold">
-                    {xp ?? 0} XP
+                     XP
                 </div>
             </header>
 
             {/* Contenu : Affichage de l'avatar */}
             <section className="flex justify-center items-center mt-8">
                 <img
-                    src={avatarUrl || "/images/default-avatar.png"}
+                    src={""}
                     alt="Avatar de l'apprenant"
                     className="w-40 h-40 rounded-full border-4 border-yellow-400"
                 />
@@ -40,7 +40,7 @@ export default function Dashboard({ user, progress, xp, weekBadge, avatarUrl }) 
                         Boutique
                     </button>
                     <span className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-2 py-0.5 rounded-full text-xs">
-                        Semaine {weekBadge ?? 1}
+                        Semaine { 1}
                     </span>
                 </div>
 
