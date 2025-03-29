@@ -10,7 +10,7 @@ async function fetchUserAvatar(user) {
 }
 
 
-export default async function Dashboard({ user, progress, xp, weekBadge, avatarUrl, activitiesData }) {
+export default async function Dashboard() {
   // État pour gérer l'ouverture du popup
   const [isActivitiesPopupOpen, setActivitiesPopupOpen] = useState(false);
   // Etat pour charger l'utilisateur
