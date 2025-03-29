@@ -1,6 +1,7 @@
 'use client'
 import { useState } from "react";
 import { supabase } from "../utils/supabaseClient.js";
+import { useRouter } from "next/router.js";
 
 export default function AuthForm() {
     const [isNewUser, setIsNewUser] = useState(false)
@@ -8,10 +9,21 @@ export default function AuthForm() {
     const [password, setPassword] = useState('')
     const [isSigningIn, setIsSigningIn] = useState(false)
     const [isSigningUp, setIsSigningUp] = useState(false)
+    const router = useRouter()
 
     async function handleLogin(e) {
         e.preventDefault();
         // handleLogin
+        setIsSigningIn(true)
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email, password
+        })
+        console.log({ error, data })
+        if (!error) {
+            router.push('/dashboard')
+        } else {
+            setIsSigningIn(false)
+        }
     }
 
     async function handleSignUp(e) {
