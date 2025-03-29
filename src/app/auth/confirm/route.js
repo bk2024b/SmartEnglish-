@@ -1,39 +1,55 @@
 import { createServerClient } from "@supabase/ssr";
-import { cookies } from 'next/headers'
-import { NextResponse } from "next/server"
+import { cookies } from 'next/headers';
+import { NextResponse } from "next/server";
 
 export async function GET(request) {
-    const { searchParams } = new URL(request.url);
-    const token_hash = searchParams.get('token_hash');
-    const next = searchParams.get('next');
-    const type = searchParams.get('type');
-    const cookieStore = cookies();
+    try {
+        const { searchParams } = new URL(request.url);
+        const token_hash = searchParams.get('token_hash');
+        const next = searchParams.get('next') || '/';
+        const type = searchParams.get('type');
+        const cookieStore = cookies();
 
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        {
-            cookies: {
-                get(name) {
-                    return cookieStore.get(name)?.value
+        // ✅ Vérification des paramètres requis
+        if (!token_hash || !type) {
+            return NextResponse.json({ error: "Missing token or type" }, { status: 400 });
+        }
+
+        // ✅ Création du client Supabase
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            {
+                cookies: {
+                    get(name) {
+                        return cookieStore.get(name)?.value;
+                    },
+                    set(name, value, options) {
+                        cookieStore.set({ name, value, ...options });
+                    },
+                    remove(name, options) {
+                        cookieStore.set({ name, value: '', ...options });
+                    },
                 },
-                set(name, value, options) {
-                    cookieStore.set({name, value, ...options})
-                },
-                remove(name, options) {
-                    cookieStore.set({name, value: '', options})
-                }
             }
-        }
-    )
+        );
 
-    if (token_hash && type) {
+        // ✅ Vérification du token OTP
         const { error } = await supabase.auth.verifyOtp({
-            type, token_hash
-        })
-        console.log({error})
-        if (!error) {
-            return NextResponse.redirect(next)
+            type,
+            token_hash,
+        });
+
+        if (error) {
+            console.error("OTP Verification Error:", error);
+            return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
         }
+
+        // ✅ Redirection après succès
+        return NextResponse.redirect(next);
+
+    } catch (err) {
+        console.error("Server Error in /auth/confirm:", err);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
