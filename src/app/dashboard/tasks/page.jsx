@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import SignOutButton from "../components/SignOutButton";
 
