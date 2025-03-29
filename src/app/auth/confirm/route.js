@@ -5,7 +5,8 @@ import { NextResponse } from "next/server"
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const token_hash = searchParams.get('token_hash');
-    const type = searchParams.get('next');
+    const next = searchParams.get('next');
+    const type = searchParams.get('type');
     const cookieStore = cookies();
 
     const supabase = createServerClient(
@@ -30,6 +31,7 @@ export async function GET(request) {
         const { error } = await supabase.auth.verifyOtp({
             type, token_hash
         })
+        console.log({error})
         if (!error) {
             return NextResponse.redirect(next)
         }
