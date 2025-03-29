@@ -23,12 +23,12 @@ export default function Dashboard() {
         // Récupération de l'avatar
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('avatar_url, xp, daysCompleted, totalDays, weekBadge')
+          .select('avatar, xp, daysCompleted, totalDays, weekBadge')
           .eq('id', user.id)
           .single();
 
         if (!error && profile) {
-          setAvatarUrl(profile.avatar_url);
+          setAvatarUrl(profile.avatar);
           setXp(profile.xp || 0);
           setProgress({
             daysCompleted: profile.daysCompleted || 0,
