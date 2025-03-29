@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SignOutButton from "../components/SignOutButton";
+import ActivitiesPopup from "../components/ActivitiesPopup"; // Importation du composant popup
+import { supabaseServer } from "../utils/supabaseServerClient"
 
-export default function Dashboard({ user, progress, xp, weekBadge, avatarUrl }) {
-  // Calcul du progrès (à adapter selon votre logique)
+async function fetchUserAvatar(user) {
+  if (!user) return;
+}
+
+
+export default async function Dashboard({ user, progress, xp, weekBadge, avatarUrl, activitiesData }) {
+  // État pour gérer l'ouverture du popup
+  const [isActivitiesPopupOpen, setActivitiesPopupOpen] = useState(false);
+  // Etat pour charger l'utilisateur
+  const {data: {user}} = await supabaseServer.auth.getUser()
+  const avatarUrl = await fetchUserAvatar(user)
+  // Calcul du progrès
   const daysCompleted = progress?.daysCompleted || 0;
   const totalDays = progress?.totalDays || 180; // 6 mois = ~180 jours
   const progressPercentage = Math.floor((daysCompleted / totalDays) * 100);
@@ -66,11 +78,21 @@ export default function Dashboard({ user, progress, xp, weekBadge, avatarUrl }) 
           </span>
         </div>
         
-        <button className="text-center w-1/3 transition-transform hover:scale-110">
+        <button 
+          className="text-center w-1/3 transition-transform hover:scale-110"
+          onClick={() => setActivitiesPopupOpen(true)} // Ouvre le popup au clic
+        >
           <span className="block text-lg mb-1">🏆</span>
           <span className="text-sm font-medium">Activités</span>
         </button>
       </footer>
+
+      {/* Popup d'activités */}
+      <ActivitiesPopup 
+        isOpen={isActivitiesPopupOpen}
+        onClose={() => setActivitiesPopupOpen(false)}
+        activitiesData={activitiesData}
+      />
 
       {/* Bouton de déconnexion */}
       <div className="absolute bottom-20 right-4">
