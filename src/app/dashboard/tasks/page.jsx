@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import SignOutButton from "../components/SignOutButton";
+import SignOutButton from "../../components/SignOutButton";
 
 export default function TasksPage({ user, progress, xp, weekBadge }) {
   // États pour gérer l'ouverture des différents popups

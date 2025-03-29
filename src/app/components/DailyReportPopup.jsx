@@ -376,7 +376,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                 <button 
                   type="submit"
                   className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 py-3
-                  "/>
+                  ">
                     Soumettre le rapport
                 </button>
               </div>
@@ -384,6 +384,6 @@ export default function DailyReportPopup({ isOpen, onClose }) {
           </div>
         </div>
       </div>
-    </div>
+  </div>
   );
 }
