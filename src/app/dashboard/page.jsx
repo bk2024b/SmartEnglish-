@@ -1,7 +1,7 @@
 import SignOutButton from "../components/SignOutButton";
 
 export default function Dashboard({ user, progress, xp, weekBadge, avatarUrl }) {
-    if (!user || !progress) {
+    if () {
         return <p>Chargement...</p>;
     }
 
