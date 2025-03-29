@@ -1,10 +1,7 @@
 import SignOutButton from "../components/SignOutButton";
 
 export default function Dashboard({ user, progress, xp, weekBadge, avatarUrl }) {
-    if () {
-        return <p>Chargement...</p>;
-    }
-
+    
     return (
         <main className="min-h-screen bg-gray-800 text-white flex flex-col justify-between relative p-4">
             {/* En-tête */}
