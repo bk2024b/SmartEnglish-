@@ -46,6 +46,22 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
     profile_id: null, // Récupération de l'ID utilisateur
   });
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error("Erreur de récupération de l'utilisateur :", error);
+        return;
+      }
+      setFormData((prevData) => ({
+        ...prevData,
+        profile_id: data.user?.id || null, // Assurer que l'ID utilisateur est bien défini
+      }));
+    };
+
+    fetchUserData();
+  }, []);
+
   // Gestion des changements dans le formulaire
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -68,21 +84,7 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
-    useEffect(() => {
-        const fetchUserData = async () => {
-          const { data, error } = await supabase.auth.getUser();
-          if (error) {
-            console.error("Erreur de récupération de l'utilisateur :", error);
-            return;
-          }
-          setFormData((prevData) => ({
-            ...prevData,
-            profile_id: data.user?.id || null, // Assurer que l'ID utilisateur est bien défini
-          }));
-        };
-    
-        fetchUserData();
-      }, []);
+   
     
     try {
      
@@ -90,7 +92,7 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
       // Envoyer les données à Supabase
       const { data, error } = await supabase
         .from('weekly_progress')
-        .insert([dataToSubmit]);
+        .insert([formData]);
         
       if (error) throw error;
       
@@ -231,9 +233,9 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-purple-400 cursor-pointer transition-colors">
                       <input 
                         type="radio" 
-                        name="mostEffectiveActivity" 
+                        name="most_effective_activity" 
                         value="Écoute immersive" 
-                        checked={formData.mostEffectiveActivity === "Écoute immersive"}
+                        checked={formData.most_effective_activity === "Écoute immersive"}
                         onChange={handleChange}
                         className="w-4 h-4 text-purple-500"
                         required
@@ -243,9 +245,9 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-purple-400 cursor-pointer transition-colors">
                       <input 
                         type="radio" 
-                        name="mostEffectiveActivity" 
+                        name="most_effective_activity" 
                         value="Shadowing" 
-                        checked={formData.mostEffectiveActivity === "Shadowing"}
+                        checked={formData.most_effective_activity === "Shadowing"}
                         onChange={handleChange}
                         className="w-4 h-4 text-purple-500"
                       />
@@ -254,9 +256,9 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-purple-400 cursor-pointer transition-colors">
                       <input 
                         type="radio" 
-                        name="mostEffectiveActivity" 
+                        name="most_effective_activity" 
                         value="Conversations" 
-                        checked={formData.mostEffectiveActivity === "Conversations"}
+                        checked={formData.most_effective_activity === "Conversations"}
                         onChange={handleChange}
                         className="w-4 h-4 text-purple-500"
                       />
@@ -265,9 +267,9 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-purple-400 cursor-pointer transition-colors">
                       <input 
                         type="radio" 
-                        name="mostEffectiveActivity" 
+                        name="most_effective_activity" 
                         value="Lecture" 
-                        checked={formData.mostEffectiveActivity === "Lecture"}
+                        checked={formData.most_effective_activity === "Lecture"}
                         onChange={handleChange}
                         className="w-4 h-4 text-purple-500"
                       />
@@ -276,18 +278,18 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-purple-400 cursor-pointer transition-colors col-span-2">
                       <input 
                         type="radio" 
-                        name="mostEffectiveActivity" 
+                        name="most_effective_activity" 
                         value="Autre" 
-                        checked={formData.mostEffectiveActivity === "Autre"}
+                        checked={formData.most_effective_activity === "Autre"}
                         onChange={handleChange}
                         className="w-4 h-4 text-purple-500"
                       />
                       <span className="text-gray-300">Autre</span>
                     </label>
-                    {formData.mostEffectiveActivity === "Autre" && (
+                    {formData.most_effective_activity === "Autre" && (
                       <input 
                         type="text" 
-                        name="mostEffectiveActivityOther" 
+                        name="most_effective_activity" 
                         value={formData.mostEffectiveActivityOther} 
                         onChange={handleChange}
                         placeholder="Précisez..."
@@ -302,8 +304,8 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                 <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
                   <label className="block text-purple-300 font-medium mb-2">Mon plus grand progrès cette semaine</label>
                   <textarea 
-                    name="biggestProgress" 
-                    value={formData.biggestProgress} 
+                    name="biggest_progress" 
+                    value={formData.biggest_progress} 
                     onChange={handleChange}
                     placeholder="Exemple : meilleure prononciation, plus à l'aise à l'oral, meilleure compréhension..."
                     className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-purple-400 focus:outline-none transition-colors h-24 resize-none"
@@ -315,8 +317,8 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                 <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
                   <label className="block text-purple-300 font-medium mb-2">Mon plus grand défi cette semaine</label>
                   <textarea 
-                    name="biggestChallenge" 
-                    value={formData.biggestChallenge} 
+                    name="biggest_challenge" 
+                    value={formData.biggest_challenge} 
                     onChange={handleChange}
                     placeholder="Exemple : peur de parler, manque de temps, difficulté à comprendre les natifs..."
                     className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-purple-400 focus:outline-none transition-colors h-24 resize-none"
@@ -328,8 +330,8 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                 <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
                   <label className="block text-purple-300 font-medium mb-2">Action que je vais mettre en place pour progresser encore plus la semaine prochaine</label>
                   <textarea 
-                    name="nextWeekAction" 
-                    value={formData.nextWeekAction} 
+                    name="next_week_action" 
+                    value={formData.next_week_action} 
                     onChange={handleChange}
                     placeholder="Décrivez l'action concrète que vous allez mettre en place..."
                     className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-purple-400 focus:outline-none transition-colors h-24 resize-none"
@@ -344,9 +346,9 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-purple-400 cursor-pointer transition-colors flex-1 justify-center">
                       <input 
                         type="radio" 
-                        name="voiceRecordingSent" 
+                        name="voice_record_sent" 
                         value="Oui" 
-                        checked={formData.voiceRecordingSent === "Oui"}
+                        checked={formData.voice_record_sent === "Oui"}
                         onChange={handleChange}
                         className="w-4 h-4 text-purple-500"
                         required
@@ -356,16 +358,16 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-purple-400 cursor-pointer transition-colors flex-1 justify-center">
                       <input 
                         type="radio" 
-                        name="voiceRecordingSent" 
+                        name="voice_record_sent" 
                         value="Non" 
-                        checked={formData.voiceRecordingSent === "Non"}
+                        checked={formData.voice_record_sent === "Non"}
                         onChange={handleChange}
                         className="w-4 h-4 text-purple-500"
                       />
                       <span className="text-gray-300">Non</span>
                     </label>
                   </div>
-                  {formData.voiceRecordingSent === "Non" && (
+                  {formData.voice_record_sent === "Non" && (
                     <div className="mt-3 p-3 bg-gray-800 rounded-lg border border-purple-800 text-gray-300 text-sm">
                       N'oublie pas d'envoyer ton enregistrement hebdomadaire pour que ton coach puisse évaluer ta progression !
                     </div>
