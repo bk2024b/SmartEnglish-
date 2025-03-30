@@ -8,13 +8,13 @@ export default function DailyReportPopup({ isOpen, onClose }) {
   // État pour stocker les réponses du formulaire
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
-    timeSpent: '',
-    activities: [],
-    phrasesLearned: '',
+    time_spent: '',
+    activities_done: [],
+    new_expressions_count: '',
     difficulties: [],
     difficultiesOther: '',
-    solutionApplied: '',
-    confidenceScore: ''
+    overcoming_strategies: '',
+    confidence_score: ''
   });
 
   // Gestion des changements dans le formulaire
@@ -104,7 +104,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="radio" 
                       name="timeSpent" 
                       value="Moins de 30 min" 
-                      checked={formData.timeSpent === "Moins de 30 min"}
+                      checked={formData.time_spent === "Moins de 30 min"}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -115,7 +115,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="radio" 
                       name="timeSpent" 
                       value="30-45 min" 
-                      checked={formData.timeSpent === "30-45 min"}
+                      checked={formData.time_spent === "30-45 min"}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -126,7 +126,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="radio" 
                       name="timeSpent" 
                       value="1h" 
-                      checked={formData.timeSpent === "1h"}
+                      checked={formData.time_spent === "1h"}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -137,7 +137,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="radio" 
                       name="timeSpent" 
                       value="Plus de 1h" 
-                      checked={formData.timeSpent === "Plus de 1h"}
+                      checked={formData.time_spent === "Plus de 1h"}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -155,7 +155,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="checkbox" 
                       name="activities" 
                       value="Écoute immersive" 
-                      checked={formData.activities.includes("Écoute immersive")}
+                      checked={formData.activities_done.includes("Écoute immersive")}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -166,7 +166,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="checkbox" 
                       name="activities" 
                       value="Shadowing" 
-                      checked={formData.activities.includes("Shadowing")}
+                      checked={formData.activities_done.includes("Shadowing")}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -177,7 +177,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="checkbox" 
                       name="activities" 
                       value="Lecture et narration" 
-                      checked={formData.activities.includes("Lecture et narration")}
+                      checked={formData.activities_done.includes("Lecture et narration")}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -188,7 +188,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="checkbox" 
                       name="activities" 
                       value="Exercice d'expression orale" 
-                      checked={formData.activities.includes("Exercice d'expression orale")}
+                      checked={formData.activities_done.includes("Exercice d'expression orale")}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -199,7 +199,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="checkbox" 
                       name="activities" 
                       value="Échange avec un natif" 
-                      checked={formData.activities.includes("Échange avec un natif")}
+                      checked={formData.activities_done.includes("Échange avec un natif")}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -217,7 +217,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="radio" 
                       name="phrasesLearned" 
                       value="1-2" 
-                      checked={formData.phrasesLearned === "1-2"}
+                      checked={formData.new_expressions_count === "1-2"}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -228,7 +228,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="radio" 
                       name="phrasesLearned" 
                       value="3-5" 
-                      checked={formData.phrasesLearned === "3-5"}
+                      checked={formData.new_expressions_count === "3-5"}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -239,7 +239,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                       type="radio" 
                       name="phrasesLearned" 
                       value="Plus de 5" 
-                      checked={formData.phrasesLearned === "Plus de 5"}
+                      checked={formData.new_expressions_count === "Plus de 5"}
                       onChange={handleChange}
                       className="w-4 h-4 text-blue-500"
                     />
@@ -325,7 +325,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                 <label className="block text-blue-300 font-medium mb-2">Comment as-tu surmonté ces difficultés ?</label>
                 <textarea 
                   name="solutionApplied" 
-                  value={formData.solutionApplied} 
+                  value={formData.overcoming_strategies} 
                   onChange={handleChange}
                   placeholder="Décrivez brièvement..."
                   className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none transition-colors h-24 resize-none"
@@ -340,7 +340,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                     <label 
                       key={score}
                       className={`flex flex-col items-center p-2 rounded-lg cursor-pointer transition-all ${
-                        formData.confidenceScore === score.toString() 
+                        formData.confidence_score === score.toString() 
                           ? 'bg-blue-500 text-white scale-110' 
                           : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                       }`}
@@ -350,7 +350,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                         type="radio" 
                         name="confidenceScore" 
                         value={score} 
-                        checked={formData.confidenceScore === score.toString()}
+                        checked={formData.confidence_score === score.toString()}
                         onChange={handleChange}
                         className="hidden"
                       />
