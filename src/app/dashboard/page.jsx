@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import SignOutButton from "../components/SignOutButton";
 import ActivitiesPopup from "../components/ActivitiesPopup";
 import { supabase } from "../utils/supabaseClient";
+import Link from 'next/link';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -87,10 +88,10 @@ export default function Dashboard() {
 
       {/* Pied de page : Menu de navigation */}
       <footer className="flex justify-around items-center py-6 px-4 bg-gray-900 rounded-t-3xl shadow-lg relative mt-auto">
-        <button className="text-center w-1/3 transition-transform hover:scale-110">
+        <Link href="/dashboard/tasks"className="text-center w-1/3 transition-transform hover:scale-110">
           <span className="block text-lg mb-1">📋</span>
           <span className="text-sm font-medium">Tâches</span>
-        </button>
+        </Link>
         <div className="relative w-1/3">
           <button className="text-center w-full transition-transform hover:scale-110">
             <span className="block text-lg mb-1">🛒</span>
