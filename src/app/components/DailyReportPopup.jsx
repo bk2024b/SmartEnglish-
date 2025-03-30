@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
 
-export default function DailyReportPopup({ isOpen, onClose }) {
+export default function DailyReportPopup({ isOpen, onClose, userId }) {
   // Si le popup n'est pas ouvert, ne rien afficher
   if (!isOpen) return null;
   
@@ -14,8 +14,16 @@ export default function DailyReportPopup({ isOpen, onClose }) {
     difficulties: [],
     difficultiesOther: '',
     overcoming_strategies: '',
-    confidence_score: ''
+    confidence_score: '',
+    profile_id: userId || null, // Récupération de l'ID utilisateur
   });
+
+  useEffect(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      profile_id: userId, // Mise à jour en cas de changement d'utilisateur
+    }));
+  }, [userId]);
 
   // Gestion des changements dans le formulaire
   const handleChange = (e) => {
