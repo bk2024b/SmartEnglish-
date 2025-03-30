@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient'; // Import du client Supabase
+import { supabase } from '../utils/supabaseClient'; // Import du client Supabase
 
 export default function ActivitiesPopup({ isOpen, onClose }) {
   const [activitiesData, setActivitiesData] = useState(null);
