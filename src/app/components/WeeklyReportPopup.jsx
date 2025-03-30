@@ -149,8 +149,8 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                     <div>
                       <input 
                         type="date" 
-                        name="weekStart" 
-                        value={formData.weekStart} 
+                        name="week_start_date" 
+                        value={formData.week_start_date} 
                         onChange={handleChange}
                         className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-purple-400 focus:outline-none transition-colors"
                         required
@@ -161,8 +161,8 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
                         <span className="text-gray-400 mr-2">au</span>
                         <input 
                           type="date" 
-                          name="weekEnd" 
-                          value={formData.weekEnd} 
+                          name="week_end_date" 
+                          value={formData.week_end_date} 
                           onChange={handleChange}
                           className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-purple-400 focus:outline-none transition-colors"
                           required
