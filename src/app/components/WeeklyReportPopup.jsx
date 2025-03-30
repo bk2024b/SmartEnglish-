@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { useEffect } from 'react';
 
 
 export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
