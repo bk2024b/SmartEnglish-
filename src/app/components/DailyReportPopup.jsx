@@ -16,15 +16,25 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
     difficultiesOther: '',
     overcoming_strategies: '',
     confidence_score: '',
-    profile_id: userId || null, // Récupération de l'ID utilisateur
+    profile_id: null, // Récupération de l'ID utilisateur
   });
-
+  
   useEffect(() => {
-    setFormData((prevData) => ({
-      ...prevData,
-      profile_id: userId, // Mise à jour en cas de changement d'utilisateur
-    }));
-  }, [userId]);
+    const fetchUserData = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error("Erreur de récupération de l'utilisateur :", error);
+        return;
+      }
+      setFormData((prevData) => ({
+        ...prevData,
+        profile_id: data.user?.id || null, // Assurer que l'ID utilisateur est bien défini
+      }));
+    };
+
+    fetchUserData();
+  }, []);
+
 
   // Gestion des changements dans le formulaire
   const handleChange = (e) => {
