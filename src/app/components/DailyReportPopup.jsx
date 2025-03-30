@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { useEffect } from 'react';
 
 export default function DailyReportPopup({ isOpen, onClose, userId }) {
   // Si le popup n'est pas ouvert, ne rien afficher
