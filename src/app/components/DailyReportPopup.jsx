@@ -41,14 +41,20 @@ export default function DailyReportPopup({ isOpen, onClose }) {
   };
 
   // Soumission du formulaire
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Ici, vous enverriez normalement les données au serveur
-    console.log("Données du rapport quotidien:", formData);
-    // Fermer le popup et éventuellement montrer un message de succès
-    onClose();
+    
+    const { data, error } = await supabase
+      .from('daily_progress')  // Nom de ta table
+      .insert([formData]);
+  
+    if (error) {
+      console.error("Erreur lors de l'envoi :", error);
+    } else {
+      console.log("Rapport enregistré :", data);
+      onClose();  // Fermer le popup après l'envoi
+    }
   };
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-70 flex items-center justify-center p-4 animate-fadeIn">
       <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-xl animate-scaleIn">
