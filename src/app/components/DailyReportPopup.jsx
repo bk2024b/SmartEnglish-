@@ -102,7 +102,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-blue-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="timeSpent" 
+                      name="time_spent" 
                       value="Moins de 30 min" 
                       checked={formData.time_spent === "Moins de 30 min"}
                       onChange={handleChange}
@@ -113,7 +113,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-blue-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="timeSpent" 
+                      name="time_spent" 
                       value="30-45 min" 
                       checked={formData.time_spent === "30-45 min"}
                       onChange={handleChange}
@@ -124,7 +124,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-blue-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="timeSpent" 
+                      name="time_spent" 
                       value="1h" 
                       checked={formData.time_spent === "1h"}
                       onChange={handleChange}
@@ -135,7 +135,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-blue-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="timeSpent" 
+                      name="time_spent" 
                       value="Plus de 1h" 
                       checked={formData.time_spent === "Plus de 1h"}
                       onChange={handleChange}
@@ -153,7 +153,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition-colors">
                     <input 
                       type="checkbox" 
-                      name="activities" 
+                      name="activities_done" 
                       value="Écoute immersive" 
                       checked={formData.activities_done.includes("Écoute immersive")}
                       onChange={handleChange}
@@ -164,7 +164,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition-colors">
                     <input 
                       type="checkbox" 
-                      name="activities" 
+                      name="activities_done" 
                       value="Shadowing" 
                       checked={formData.activities_done.includes("Shadowing")}
                       onChange={handleChange}
@@ -175,7 +175,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition-colors">
                     <input 
                       type="checkbox" 
-                      name="activities" 
+                      name="activities_done" 
                       value="Lecture et narration" 
                       checked={formData.activities_done.includes("Lecture et narration")}
                       onChange={handleChange}
@@ -186,7 +186,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition-colors">
                     <input 
                       type="checkbox" 
-                      name="activities" 
+                      name="activities_done" 
                       value="Exercice d'expression orale" 
                       checked={formData.activities_done.includes("Exercice d'expression orale")}
                       onChange={handleChange}
@@ -197,7 +197,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition-colors">
                     <input 
                       type="checkbox" 
-                      name="activities" 
+                      name="activities_done" 
                       value="Échange avec un natif" 
                       checked={formData.activities_done.includes("Échange avec un natif")}
                       onChange={handleChange}
@@ -215,7 +215,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex-1 flex items-center justify-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-blue-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="phrasesLearned" 
+                      name="new_expressions_count" 
                       value="1-2" 
                       checked={formData.new_expressions_count === "1-2"}
                       onChange={handleChange}
@@ -226,7 +226,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex-1 flex items-center justify-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-blue-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="phrasesLearned" 
+                      name="new_expressions_count" 
                       value="3-5" 
                       checked={formData.new_expressions_count === "3-5"}
                       onChange={handleChange}
@@ -237,7 +237,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                   <label className="flex-1 flex items-center justify-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-blue-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="phrasesLearned" 
+                      name="new_expressions_count" 
                       value="Plus de 5" 
                       checked={formData.new_expressions_count === "Plus de 5"}
                       onChange={handleChange}
@@ -324,7 +324,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
               <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
                 <label className="block text-blue-300 font-medium mb-2">Comment as-tu surmonté ces difficultés ?</label>
                 <textarea 
-                  name="solutionApplied" 
+                  name="overcoming_strategies" 
                   value={formData.overcoming_strategies} 
                   onChange={handleChange}
                   placeholder="Décrivez brièvement..."
@@ -348,7 +348,7 @@ export default function DailyReportPopup({ isOpen, onClose }) {
                     >
                       <input 
                         type="radio" 
-                        name="confidenceScore" 
+                        name="confidence_score" 
                         value={score} 
                         checked={formData.confidence_score === score.toString()}
                         onChange={handleChange}
