@@ -75,7 +75,7 @@ export default function WeeklyReportPopup({ isOpen, onClose }) {
               onClick={onClose}
               className="text-white hover:text-gray-200 transition-colors"
             >
-              \u2715
+              x
             </button>
           </div>
         </div>
