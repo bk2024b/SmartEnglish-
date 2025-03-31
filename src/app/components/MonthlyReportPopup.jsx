@@ -261,7 +261,7 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                       onChange={handleChange}
                       className="hidden"
                     />
-                    <span className={`text-xl font-bold ${formData.confidenceScore === "2" ? "text-green-400" : "text-gray-400"}`}>2</span>
+                    <span className={`text-xl font-bold ${formData.confidence_score === "2" ? "text-green-400" : "text-gray-400"}`}>2</span>
                     <span className="text-xs text-gray-400">Encore difficile</span>
                   </label>
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
@@ -273,7 +273,7 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                       onChange={handleChange}
                       className="hidden"
                     />
-                    <span className={`text-xl font-bold ${formData.confidenceScore === "3" ? "text-green-400" : "text-gray-400"}`}>3</span>
+                    <span className={`text-xl font-bold ${formData.confidence_score === "3" ? "text-green-400" : "text-gray-400"}`}>3</span>
                     <span className="text-xs text-gray-400">Je m'améliore</span>
                   </label>
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
@@ -285,7 +285,7 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                       onChange={handleChange}
                       className="hidden"
                     />
-                    <span className={`text-xl font-bold ${formData.confidenceScore === "4" ? "text-green-400" : "text-gray-400"}`}>4</span>
+                    <span className={`text-xl font-bold ${formData.confidence_score === "4" ? "text-green-400" : "text-gray-400"}`}>4</span>
                     <span className="text-xs text-gray-400">Presque fluide</span>
                   </label>
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
