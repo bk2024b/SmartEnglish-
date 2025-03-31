@@ -26,8 +26,26 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
     newSkill2: '',
     newSkill3: '',
     confidence_score: '',
-    voice_record_sent: ''
+    voice_record_sent: '',
+    profile_id: null, // Récupération de l'ID utilisateur
   });
+
+  useEffect(() => {
+      const fetchUserData = async () => {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error("Erreur de récupération de l'utilisateur :", error);
+          return;
+        }
+        setFormData((prevData) => ({
+          ...prevData,
+          profile_id: data.user?.id || null, // Assurer que l'ID utilisateur est bien défini
+        }));
+      };
+  
+      fetchUserData();
+    }, []);
+
   const updateAvatar = async () => {
     if (!user) return;
   
