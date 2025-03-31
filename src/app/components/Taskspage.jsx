@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import SignOutButton from "../components/SignOutButton";
+import DailyReportPopup from '../components/DailyReportPopup';
+import WeeklyReportPopup from '../components/WeeklyReportPopup';
+import MonthlyReportPopup from '../components/MonthlyReportPopup';
 
 export default function TasksPage({ user, progress, xp, weekBadge }) {
   // États pour gérer l'ouverture des différents popups

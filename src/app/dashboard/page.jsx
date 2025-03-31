@@ -74,7 +74,7 @@ export default function Dashboard() {
           if (!profile.avatar) {
             await supabase
               .from('profiles')
-              .insert({ avatar: "/avatars/stage1.jpg" })
+              .update({ avatar: "/avatars/stage1.jpg" })
               .eq('id', user.id);
           }
         }
