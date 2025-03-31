@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import { useEffect } from 'react';
 
 export default function MonthlyReportPopup({ isOpen, onClose }) {
   // Si le popup n'est pas ouvert, ne rien afficher
@@ -247,7 +249,7 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                       onChange={handleChange}
                       className="hidden"
                     />
-                    <span className={`text-xl font-bold ${formData.confidenceScore === "1" ? "text-green-400" : "text-gray-400"}`}>1</span>
+                    <span className={`text-xl font-bold ${formData.confidence_score === "1" ? "text-green-400" : "text-gray-400"}`}>1</span>
                     <span className="text-xs text-gray-400">Toujours stressé(e)</span>
                   </label>
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
