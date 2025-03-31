@@ -6,6 +6,8 @@ import ActivitiesPopup from "../components/ActivitiesPopup";
 import { supabase } from "../utils/supabaseClient";
 import Link from 'next/link';
 
+
+
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
@@ -14,34 +16,74 @@ export default function Dashboard() {
   const [progress, setProgress] = useState({ daysCompleted: 0, totalDays: 180 });
   const [weekBadge, setWeekBadge] = useState(1);
   const [activitiesData, setActivitiesData] = useState([]);
+  const avatars = [
+    "/avatars/stage1.jpg",
+    "/avatars/stage2.webp",
+    "/avatars/stage3.jpg",
+    "/avatars/stage4.jpg",
+    "/avatars/stage5.webp",
+    "/avatars/stage6.webp"
+  ];
+  
+  const updateAvatar = async () => {
+    if (!user) return;
+  
+    // Trouver l'index actuel de l'avatar
+    const currentIndex = avatars.indexOf(avatarUrl);
+    const nextIndex = Math.min(currentIndex + 1, avatars.length - 1);
+    const newAvatar = avatars[nextIndex];
+  
+    // Mise à jour dans Supabase
+    const { error } = await supabase
+      .from('profiles')
+      .update({ avatar: newAvatar })
+      .eq('id', user.id);
+  
+    if (error) {
+      console.error("Erreur lors de la mise à jour de l'avatar:", error);
+    } else {
+      setAvatarUrl(newAvatar); // Mise à jour de l'état local
+    }
+  };
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
-
-        // Récupération de l'avatar
+  
+        // Récupération de l'avatar et des autres infos
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('avatar_url, xp, daysCompleted, totalDays, weekBadge')
+          .select('avatar, xp, daysCompleted, totalDays, weekBadge')
           .eq('id', user.id)
           .single();
-
+  
         if (!error && profile) {
-          setAvatarUrl(profile.avatar_url);
+          let avatar = profile.avatar || "/avatars/stage1.jpg"; // Utiliser l'avatar par défaut si absent
+          setAvatarUrl(avatar);
           setXp(profile.xp || 0);
           setProgress({
             daysCompleted: profile.daysCompleted || 0,
             totalDays: profile.totalDays || 180,
           });
           setWeekBadge(profile.weekBadge || 1);
+  
+          // Si l'avatar était null dans la base, mettre à jour Supabase avec stage1.jpg
+          if (!profile.avatar) {
+            await supabase
+              .from('profiles')
+              .insert({ avatar: "/avatars/stage1.jpg" })
+              .eq('id', user.id);
+          }
         }
       }
     };
-
+  
     fetchUserData();
   }, []);
+  
 
   const progressPercentage = Math.floor((progress.daysCompleted / progress.totalDays) * 100);
 
@@ -62,6 +104,13 @@ export default function Dashboard() {
         <div className="flex items-center bg-gradient-to-r from-yellow-500 to-amber-500 text-black px-4 py-2 rounded-lg font-bold shadow-lg">
           <span className="text-lg mr-1">⚡</span>
           <span>{xp} XP</span>
+          <button 
+  onClick={updateAvatar}
+  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
+>
+  Changer d'avatar
+</button>
+
         </div>
       </header>
 
@@ -70,7 +119,7 @@ export default function Dashboard() {
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-md opacity-70 animate-pulse"></div>
           <img
-            src={avatarUrl || "/placeholder-avatar.png"}
+            src={avatarUrl || "/avatars/stage1.jpg"}
             alt="Avatar de l'apprenant"
             className="relative w-44 h-44 rounded-full border-4 border-yellow-400 object-cover z-10"
           />
