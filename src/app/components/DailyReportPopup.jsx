@@ -14,13 +14,12 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
     overcoming_strategies: '',
     confidence_score: '',
     profile_id: null,
-    xp_points: xpEarned,
+    xp_points: 0, // Initialisez avec 0, pas avec xpEarned
   });
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   
-
   useEffect(() => {
     const fetchUserData = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -57,10 +56,13 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
     setLoading(true);
     setErrorMessage('');
 
-    const xpEarned = calculateXP(formData);
+    const xpEarned = calculateXP(formData);  // Calculer les XP après soumission du formulaire
+    setFormData(prevData => ({
+      ...prevData,
+      xp_points: xpEarned, // Mettre à jour xp_points
+    }));
 
     const { error } = await supabase.from('daily_progress').insert([formData]);
-
 
     if (error) {
       console.error("Erreur lors de l'envoi :", error);
@@ -68,35 +70,36 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
     } else {
       console.log("Rapport enregistré !");
       onClose();
-    };
-    const calculateXP = (formData) => {
-      let xp = 10; // XP de base
-    
-      if (formData.time_spent === "Plus de 1h") xp += 15;
-      else if (formData.time_spent === "1h") xp += 10;
-      else if (formData.time_spent === "30-45 min") xp += 5;
-    
-      xp += formData.activities_done.length * 5; // 5 XP par activité réalisée
-    
-      if (formData.new_expressions_count === "3-5") xp += 5;
-      else if (formData.new_expressions_count === "6 ou plus") xp += 10;
-    
-      return xp;
-    };
-    
-    setLoading(false);
+    }
 
     // Mettre à jour le total XP dans le profil utilisateur
     const { error: profileError } = await supabase
-    .from("profiles")
-    .update({ xp: supabase.raw("xp + " + xpEarned) })
-    .eq("id", formData.profile_id); 
+      .from("profiles")
+      .update({ xp: supabase.raw("xp + " + xpEarned) })
+      .eq("id", formData.profile_id); 
 
     if (profileError) {
       console.error("Erreur lors de la mise à jour des XP :", profileError);
     }
     console.log("Rapport enregistré avec XP :", xpEarned);
+    setLoading(false);
     onClose();
+  };
+
+  // Fonction de calcul des XP
+  const calculateXP = (formData) => {
+    let xp = 10; // XP de base
+
+    if (formData.time_spent === "Plus de 1h") xp += 15;
+    else if (formData.time_spent === "1h") xp += 10;
+    else if (formData.time_spent === "30-45 min") xp += 5;
+
+    xp += formData.activities_done.length * 5; // 5 XP par activité réalisée
+
+    if (formData.new_expressions_count === "3-5") xp += 5;
+    else if (formData.new_expressions_count === "6 ou plus") xp += 10;
+
+    return xp;
   };
 
   return (
