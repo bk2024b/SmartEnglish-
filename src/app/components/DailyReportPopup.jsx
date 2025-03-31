@@ -19,20 +19,6 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const calculateXP = (formData) => {
-    let xp = 10; // XP de base
-  
-    if (formData.time_spent === "Plus de 1h") xp += 15;
-    else if (formData.time_spent === "1h") xp += 10;
-    else if (formData.time_spent === "30-45 min") xp += 5;
-  
-    xp += formData.activities_done.length * 5; // 5 XP par activité réalisée
-  
-    if (formData.new_expressions_count === "3-5") xp += 5;
-    else if (formData.new_expressions_count === "6 ou plus") xp += 10;
-  
-    return xp;
-  };
   
 
   useEffect(() => {
@@ -82,7 +68,22 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
     } else {
       console.log("Rapport enregistré !");
       onClose();
-    }
+    };
+    const calculateXP = (formData) => {
+      let xp = 10; // XP de base
+    
+      if (formData.time_spent === "Plus de 1h") xp += 15;
+      else if (formData.time_spent === "1h") xp += 10;
+      else if (formData.time_spent === "30-45 min") xp += 5;
+    
+      xp += formData.activities_done.length * 5; // 5 XP par activité réalisée
+    
+      if (formData.new_expressions_count === "3-5") xp += 5;
+      else if (formData.new_expressions_count === "6 ou plus") xp += 10;
+    
+      return xp;
+    };
+    
     setLoading(false);
 
     // Mettre à jour le total XP dans le profil utilisateur
