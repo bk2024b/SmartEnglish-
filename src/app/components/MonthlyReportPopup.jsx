@@ -4,6 +4,8 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
   // Si le popup n'est pas ouvert, ne rien afficher
   if (!isOpen) return null;
   
+
+  
   // Obtenir le mois actuel
   const getCurrentMonth = () => {
     const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
@@ -15,40 +17,66 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
   // État pour stocker les réponses du formulaire
   const [formData, setFormData] = useState({
     month: getCurrentMonth(),
-    progressionRate: '',
-    changesNoticed: '',
-    biggestChallenge: '',
+    progression_evaluation: '',
+    changes_noticed: '',
+    biggest_monthly_challenge: '',
     newSkill1: '',
     newSkill2: '',
     newSkill3: '',
-    confidenceScore: '',
-    voiceRecordingSent: ''
+    confidence_score: '',
+    voice_record_sent: ''
   });
-
-  // Gestion des changements dans le formulaire
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    
-    if (type === 'checkbox' || type === 'radio') {
-      setFormData({
-        ...formData,
-        [name]: value
-      });
+  const updateAvatar = async () => {
+    if (!user) return;
+  
+    // Trouver l'index actuel de l'avatar
+    const currentIndex = avatars.indexOf(avatarUrl);
+    const nextIndex = Math.min(currentIndex + 1, avatars.length - 1);
+    const newAvatar = avatars[nextIndex];
+  
+    // Mise à jour dans Supabase
+    const { error } = await supabase
+      .from('profiles')
+      .update({ avatar: newAvatar })
+      .eq('id', user.id);
+  
+    if (error) {
+      console.error("Erreur lors de la mise à jour de l'avatar:", error);
     } else {
-      setFormData({
-        ...formData,
-        [name]: value
-      });
+      setAvatarUrl(newAvatar); // Mise à jour de l'état local
     }
   };
+  // Gestion des changements dans le formulaire
+  const handleChange = (e) => {
+    const { name, value, type } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? e.target.checked : value
+    }));
+  };
+  
 
   // Soumission du formulaire
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Ici, vous enverriez normalement les données au serveur
-    console.log("Données du rapport mensuel:", formData);
-    // Fermer le popup et éventuellement montrer un message de succès
-    onClose();
+    
+    try {
+      // Envoyer les données à Supabase
+      const { data, error } = await supabase
+        .from('weekly_progress')
+        .insert([formData]);
+        
+      if (error) throw error;
+      
+      // Afficher le message de succès
+      updateAvatar();
+      alert("Bilan mensuel enregistré avec succès !");
+      onClose();
+      
+    } catch (error) {
+      console.error("Erreur lors de l'envoi des données:", error);
+      
+    } 
   };
 
   return (
@@ -109,9 +137,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
                     <input 
                       type="radio" 
-                      name="progressionRate" 
+                      name="progression_evaluation" 
                       value="Lente mais je progresse" 
-                      checked={formData.progressionRate === "Lente mais je progresse"}
+                      checked={formData.progression_evaluation === "Lente mais je progresse"}
                       onChange={handleChange}
                       className="w-4 h-4 text-green-500"
                     />
@@ -120,9 +148,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
                     <input 
                       type="radio" 
-                      name="progressionRate" 
+                      name="progression_evaluation" 
                       value="Bonne progression" 
-                      checked={formData.progressionRate === "Bonne progression"}
+                      checked={formData.progression_evaluation === "Bonne progression"}
                       onChange={handleChange}
                       className="w-4 h-4 text-green-500"
                     />
@@ -131,9 +159,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
                     <input 
                       type="radio" 
-                      name="progressionRate" 
+                      name="progression_evaluation" 
                       value="Très grande amélioration !" 
-                      checked={formData.progressionRate === "Très grande amélioration !"}
+                      checked={formData.progression_evaluation === "Très grande amélioration !"}
                       onChange={handleChange}
                       className="w-4 h-4 text-green-500"
                     />
@@ -146,8 +174,8 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
               <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
                 <label className="block text-green-300 font-medium mb-2">Quels changements as-tu remarqués dans ta compréhension et ton expression orale ?</label>
                 <textarea 
-                  name="changesNoticed" 
-                  value={formData.changesNoticed} 
+                  name="changes_noticed" 
+                  value={formData.changes_noticed} 
                   onChange={handleChange}
                   placeholder="Décrivez brièvement les changements que vous avez remarqués..."
                   className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors h-24 resize-none"
@@ -158,8 +186,8 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
               <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
                 <label className="block text-green-300 font-medium mb-2">Quel a été ton plus grand challenge ce mois-ci ?</label>
                 <textarea 
-                  name="biggestChallenge" 
-                  value={formData.biggestChallenge} 
+                  name="biggest_monthly_challenge" 
+                  value={formData.biggest_monthly_challenge} 
                   onChange={handleChange}
                   placeholder="Exemple : trouver du temps, surmonter la peur de parler..."
                   className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors h-24 resize-none"
@@ -213,9 +241,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
                     <input 
                       type="radio" 
-                      name="confidenceScore" 
+                      name="confidence_score" 
                       value="1" 
-                      checked={formData.confidenceScore === "1"}
+                      checked={formData.confidence_score === "1"}
                       onChange={handleChange}
                       className="hidden"
                     />
@@ -225,9 +253,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
                     <input 
                       type="radio" 
-                      name="confidenceScore" 
+                      name="confidence_score" 
                       value="2" 
-                      checked={formData.confidenceScore === "2"}
+                      checked={formData.confidence_score === "2"}
                       onChange={handleChange}
                       className="hidden"
                     />
@@ -237,9 +265,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
                     <input 
                       type="radio" 
-                      name="confidenceScore" 
+                      name="confidence_score" 
                       value="3" 
-                      checked={formData.confidenceScore === "3"}
+                      checked={formData.confidence_score === "3"}
                       onChange={handleChange}
                       className="hidden"
                     />
@@ -249,9 +277,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
                     <input 
                       type="radio" 
-                      name="confidenceScore" 
+                      name="confidence_score" 
                       value="4" 
-                      checked={formData.confidenceScore === "4"}
+                      checked={formData.confidence_score === "4"}
                       onChange={handleChange}
                       className="hidden"
                     />
@@ -261,9 +289,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
                     <input 
                       type="radio" 
-                      name="confidenceScore" 
+                      name="confidence_score" 
                       value="5" 
-                      checked={formData.confidenceScore === "5"}
+                      checked={formData.confidence_score === "5"}
                       onChange={handleChange}
                       className="hidden"
                     />
@@ -280,9 +308,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="voiceRecordingSent" 
+                      name="voice_record_sent" 
                       value="Oui" 
-                      checked={formData.voiceRecordingSent === "Oui"}
+                      checked={formData.voice_record_sent === "Oui"}
                       onChange={handleChange}
                       className="w-4 h-4 text-green-500"
                     />
@@ -291,9 +319,9 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                   <label className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors">
                     <input 
                       type="radio" 
-                      name="voiceRecordingSent" 
+                      name="voice_record_sent" 
                       value="Non" 
-                      checked={formData.voiceRecordingSent === "Non"}
+                      checked={formData.voice_record_sent === "Non"}
                       onChange={handleChange}
                       className="w-4 h-4 text-green-500"
                     />
