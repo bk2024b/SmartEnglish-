@@ -63,7 +63,7 @@ export default function Dashboard() {
         if (!error && profile) {
           let avatar = profile.avatar || "/avatars/stage1.jpg"; // Utiliser l'avatar par défaut si absent
           setAvatarUrl(avatar);
-          setXp(profile.xp || 0);
+          setXp(profile.xp || 1);
           setProgress({
             daysCompleted: profile.daysCompleted || 0,
             totalDays: profile.totalDays || 180,
