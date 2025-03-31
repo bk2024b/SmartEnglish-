@@ -65,6 +65,10 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
 
   // Sauvegarder l'audio
     const saveAudio = async () => {
+        // Récupérer l'URL publique du fichier
+      const { data: urlData } = supabase.storage
+      .from('audio-recordings')
+      .getPublicUrl(fileName);
         const fileName = `${userId}_${Date.now()}.webm`;
         const { error: dbError } = await supabase
         .from('audio_notes')
