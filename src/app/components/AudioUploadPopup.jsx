@@ -65,6 +65,7 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
 
   // Sauvegarder l'audio
     const saveAudio = async () => {
+        const fileName = `${userId}_${Date.now()}.webm`;
         const { error: dbError } = await supabase
         .from('audio_notes')
         .insert({
