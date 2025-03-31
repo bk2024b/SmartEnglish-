@@ -88,7 +88,7 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
 
       // Récupérer l'URL publique du fichier
       const { data: urlData } = supabase.storage
-        .from('audio_recordings')
+        .from('audio-recordings')
         .getPublicUrl(fileName);
 
       // Enregistrer les métadonnées dans la base de données
