@@ -64,7 +64,17 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
   };
 
   // Sauvegarder l'audio
-  const saveAudio = async () => {
+    const saveAudio = async () => {
+        const { error: dbError } = await supabase
+        .from('audio_notes')
+        .insert({
+        user_id: userId,
+        title: title,
+        file_path: fileName, // fileName is not defined yet!
+        file_url: urlData.publicUrl, // urlData is not defined yet!
+        created_at: new Date().toISOString()
+        })
+    .select();
     if (!audioBlob) {
       setErrorMessage("Aucun audio à enregistrer");
       return;
