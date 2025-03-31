@@ -65,7 +65,7 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
     try {
       // Envoyer les données à Supabase
       const { data, error } = await supabase
-        .from('weekly_progress')
+        .from('monthly_progress')
         .insert([formData]);
         
       if (error) throw error;
