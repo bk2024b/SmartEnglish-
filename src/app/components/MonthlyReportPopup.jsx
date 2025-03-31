@@ -295,7 +295,7 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
                       onChange={handleChange}
                       className="hidden"
                     />
-                    <span className={`text-xl font-bold ${formData.confidenceScore === "5" ? "text-green-400" : "text-gray-400"}`}>5</span>
+                    <span className={`text-xl font-bold ${formData.confidence_score === "5" ? "text-green-400" : "text-gray-400"}`}>5</span>
                     <span className="text-xs text-gray-400">Je parle sans problème !</span>
                   </label>
                 </div>
