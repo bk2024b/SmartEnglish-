@@ -65,17 +65,6 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
 
   // Sauvegarder l'audio
   const saveAudio = async () => {
-    // Dans la fonction saveAudio
-    const { error: dbError } = await supabase
-        .from('audio_notes')
-        .insert({
-        user_id: userId,
-        title: title,
-        file_path: fileName,
-        file_url: urlData.publicUrl,
-        created_at: new Date().toISOString()
-        })
-    .select(); // Ajoutez .select() pour contourner certaines limitations RLS
     if (!audioBlob) {
       setErrorMessage("Aucun audio à enregistrer");
       return;
@@ -111,7 +100,8 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
           file_path: fileName,
           file_url: urlData.publicUrl,
           created_at: new Date().toISOString()
-        });
+        })
+        .select(); // Ajoutez .select() pour contourner certaines limitations RLS
 
       if (dbError) throw dbError;
 
