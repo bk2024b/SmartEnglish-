@@ -36,8 +36,8 @@ export default function AdminDashboard() {
          // .eq('id', user.id)
          // .single();
           
-        if (profileError || profile.role !== 'admin') {
-          console.error("Accès non autorisé");
+        //if (profileError || profile.role !== 'admin') {
+         // console.error("Accès non autorisé");
           // Rediriger vers la page d'accueil ou afficher une erreur
           return;
         }
