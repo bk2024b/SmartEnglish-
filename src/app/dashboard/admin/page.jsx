@@ -30,11 +30,11 @@ export default function AdminDashboard() {
         setUser(user);
         
         // Vérifier le rôle admin dans la table profiles
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+        //const { data: profile, error: profileError } = await supabase
+        //  .from('profiles')
+         // .select('role')
+         // .eq('id', user.id)
+         // .single();
           
         if (profileError || profile.role !== 'admin') {
           console.error("Accès non autorisé");
