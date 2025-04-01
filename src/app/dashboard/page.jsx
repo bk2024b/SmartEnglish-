@@ -131,7 +131,7 @@ export default function Dashboard() {
       {/* En-tête */}
       <header className="flex justify-between items-center py-3">
         <div className="flex flex-col">
-          <p className="text-sm text-gray-300">{user?.email || "Utilisateur inconnu"}</p>
+          <p className="text-sm text-gray-300">{user?.display_name || "Utilisateur inconnu"}</p>
           
           {coachingStarted && (
             <>
