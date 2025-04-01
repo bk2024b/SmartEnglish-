@@ -34,10 +34,23 @@ export default function AuthForm() {
       password,
       options: {
         data: {
-          full_name: fullName
+          display_name: fullName
         }
       }
     })
+    if (!error) {
+      // Insérer le nom dans la table profiles
+      const { user } = data;
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([{ user_id: user.id, full_name: fullName }]);
+    
+      if (profileError) {
+        console.error('Erreur lors de l\'insertion du profil:', profileError);
+      } else {
+        setIsSigningUp(true);
+      }
+    }
     if (!error) {
       setIsSigningUp(true)
     } else {

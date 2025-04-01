@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import SignOutButton from "../components/SignOutButton";
+import Link from 'next/link';
+import { supabase } from "../utils/supabaseClient";
 import ActivitiesPopup from "../components/ActivitiesPopup";
 import AudioUploadPopup from "../components/AudioUploadPopup";
-import { supabase } from "../utils/supabaseClient";
-import Link from 'next/link';
+
+// Composant SignOutButton déplacé dans son propre fichier components/SignOutButton.jsx
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -110,6 +111,19 @@ export default function Dashboard() {
     fetchUserData();
   }, []);
 
+  // Fonction pour obtenir le suffixe ordinal en anglais (1st, 2nd, 3rd, etc.)
+  const getOrdinalSuffix = (num) => {
+    if (num % 100 >= 11 && num % 100 <= 13) {
+      return 'th';
+    }
+    switch (num % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+
   const progressPercentage = Math.floor((progress.daysCompleted / progress.totalDays) * 100);
 
   return (
@@ -133,12 +147,20 @@ export default function Dashboard() {
         </div>
         
         <div className="flex items-center">
-          <button onClick={() => setAudioPopupOpen(true)} className="bg-red-600 rounded-full p-2 shadow-lg hover:bg-red-700 transition">
+          <button onClick={() => setAudioPopupOpen(true)} className="bg-red-600 rounded-full p-2 shadow-lg hover:bg-red-700 transition mr-3">
             <span className="text-lg">🎙️</span>
           </button>
-          <button onClick={() => {}/* Action de déconnexion */} className="ml-3 bg-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-600 transition">
-            <span className="text-lg">⏻</span>
-          </button>
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="bg-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-600 transition flex items-center justify-center"
+              aria-label="Se déconnecter"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" d="M3 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h7a1 1 0 1 0 0-2H4V5h6a1 1 0 1 0 0-2H3zm11.707 4.707a1 1 0 0 0-1.414-1.414l-3 3a1 1 0 0 0 0 1.414l3 3a1 1 0 0 0 1.414-1.414L13.414 11H17a1 1 0 1 0 0-2h-3.586l1.293-1.293z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </form>
         </div>
       </header>
 
@@ -170,12 +192,14 @@ export default function Dashboard() {
             <p className="text-xs text-center text-gray-300">Niveau {level}</p>
           </div>
         </div>
+        
+        {/* Badge de semaine - Nouveau design */}
+        <div className="mt-6 bg-gradient-to-r from-indigo-600 to-purple-700 rounded-lg px-5 py-2 shadow-lg border border-indigo-400">
+          <p className="text-sm font-bold text-white">
+            {weekBadge}<sup>{getOrdinalSuffix(weekBadge)}</sup> Week
+          </p>
+        </div>
       </section>
-
-      {/* Semaine Badge - Séparé du menu */}
-      <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg border border-indigo-300 z-20">
-        Semaine {weekBadge}
-      </div>
 
       {/* Pied de page : Menu de navigation */}
       <footer className="fixed bottom-0 left-0 right-0 flex justify-around items-center py-5 px-4 bg-gray-900 rounded-t-3xl shadow-lg">
