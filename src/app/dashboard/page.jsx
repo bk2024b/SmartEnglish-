@@ -172,21 +172,21 @@ export default function Dashboard() {
         </div>
       </section>
 
+      {/* Semaine Badge - Séparé du menu */}
+      <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg border border-indigo-300 z-20">
+        Semaine {weekBadge}
+      </div>
+
       {/* Pied de page : Menu de navigation */}
       <footer className="fixed bottom-0 left-0 right-0 flex justify-around items-center py-5 px-4 bg-gray-900 rounded-t-3xl shadow-lg">
         <Link href="/dashboard/tasks" className="text-center w-1/3 transition-transform hover:scale-110">
           <span className="block text-lg mb-1">📋</span>
           <span className="text-sm font-medium">Tâches</span>
         </Link>
-        <div className="relative w-1/3">
-          <Link href="/dashboard" className="text-center w-full block transition-transform hover:scale-110">
-            <span className="block text-lg mb-1">🏠</span>
-            <span className="text-sm font-medium">Accueil</span>
-          </Link>
-          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg border border-indigo-300">
-            Semaine {weekBadge}
-          </div>
-        </div>
+        <Link href="/dashboard" className="text-center w-1/3 block transition-transform hover:scale-110">
+          <span className="block text-lg mb-1">🏠</span>
+          <span className="text-sm font-medium">Accueil</span>
+        </Link>
         <button 
           className="text-center w-1/3 transition-transform hover:scale-110"
           onClick={() => setActivitiesPopupOpen(true)}
