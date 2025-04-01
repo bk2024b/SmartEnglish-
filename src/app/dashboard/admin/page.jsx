@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from "../../utils/supabaseClient";
 import Link from 'next/link';
-import ActivityFormPopup from "../../components/ActivityFormPopup";
+import ActivityFormPopup from "../../components/ActivityFormPopup.jsx";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
