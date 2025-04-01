@@ -6,10 +6,9 @@ import { supabase } from "../utils/supabaseClient";
 import ActivitiesPopup from "../components/ActivitiesPopup";
 import AudioUploadPopup from "../components/AudioUploadPopup";
 
-// Composant SignOutButton déplacé dans son propre fichier components/SignOutButton.jsx
-
 export default function Dashboard() {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isActivitiesPopupOpen, setActivitiesPopupOpen] = useState(false);
   const [isAudioPopupOpen, setAudioPopupOpen] = useState(false);
@@ -30,28 +29,32 @@ export default function Dashboard() {
   
   useEffect(() => {
     const fetchUserData = async () => {
+      // Étape 1: Récupérer l'utilisateur actuellement connecté
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (user) {
-        setUser({
-          ...user,
-          full_name: profile.full_name || user.email // Utilise l'email comme fallback
-        });
-  
-        // Vérifier si le coaching a commencé
+        setUser(user);
+        
+        // Étape 2: Vérifier si le coaching a commencé
         const startDate = new Date('2025-04-07');
         const currentDate = new Date();
         const hasCoachingStarted = currentDate >= startDate;
         setCoachingStarted(hasCoachingStarted);
         
-        // Récupération de l'avatar et des autres infos
+        // Étape 3: Récupérer le profil de l'utilisateur
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('avatar, weekBadge, daysCompleted, totalDays')
-          .eq('id', user.id)
+          .select('*')
+          .eq('user_id', user.id)  // Utilisez user_id au lieu de id
           .single();
-  
-        if (!error && profile) {
-          let avatar = profile.avatar || "/avatars/stage1.jpg"; // Utiliser l'avatar par défaut si absent
+        
+        console.log("Profil récupéré:", profile, "Erreur:", error);
+        
+        if (profile) {
+          setUserProfile(profile);
+          
+          // Initialiser l'avatar et les autres informations
+          let avatar = profile.avatar || "/avatars/stage1.jpg";
           setAvatarUrl(avatar);
           
           // Initialiser la progression
@@ -79,7 +82,7 @@ export default function Dashboard() {
               await supabase
                 .from('profiles')
                 .update({ daysCompleted })
-                .eq('id', user.id);
+                .eq('user_id', user.id);  // Utilisez user_id au lieu de id
             }
           }
           
@@ -105,8 +108,10 @@ export default function Dashboard() {
                 avatar: newAvatar,
                 weekBadge: diffWeeks
               })
-              .eq('id', user.id);
+              .eq('user_id', user.id);  // Utilisez user_id au lieu de id
           }
+        } else {
+          console.error("Erreur lors de la récupération du profil:", error);
         }
       }
     };
@@ -128,13 +133,16 @@ export default function Dashboard() {
   }
 
   const progressPercentage = Math.floor((progress.daysCompleted / progress.totalDays) * 100);
+  
+  // Obtenir le nom complet ou utiliser une valeur par défaut
+  const fullName = userProfile?.full_name || user?.user_metadata?.display_name || user?.email || "Utilisateur";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col justify-between relative p-4 pb-20">
       {/* En-tête */}
       <header className="flex justify-between items-center py-3">
         <div className="flex flex-col">
-          <p className="text-sm text-gray-300">{user?.full_name || "Utilisateur inconnu"}</p>
+          <p className="text-sm text-gray-300">{fullName}</p>
           
           {coachingStarted && (
             <>
