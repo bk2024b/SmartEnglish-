@@ -254,4 +254,75 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                 
                 {/* Activité 3 */}
                 <div className="border-l-4 border-green-500 pl-3 pb-1">
-                  <h3 className="font-medium text-green-600 mb-2">Activité 3
+                  <h3 className="font-medium text-green-600 mb-2">Activité 3</h3>
+                  
+                  <div className="mb-4">
+                    <label htmlFor="activite_3_titre" className="block text-sm font-medium text-gray-700 mb-1">
+                      Titre
+                    </label>
+                    <input
+                      type="text"
+                      id="activite_3_titre"
+                      name="activite_3_titre"
+                      value={formData.activite_3_titre}
+                      onChange={handleChange}
+                      placeholder="Ex: Quiz d'évaluation"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="activite_3_consignes" className="block text-sm font-medium text-gray-700 mb-1">
+                      Consignes
+                    </label>
+                    <textarea
+                      id="activite_3_consignes"
+                      name="activite_3_consignes"
+                      rows="2"
+                      value={formData.activite_3_consignes}
+                      onChange={handleChange}
+                      placeholder="Détaillez les instructions pour cette activité"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      required
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+            {saveError && <p className="text-red-500 text-sm">{saveError}</p>}
+            {saveSuccess && <p className="text-green-500 text-sm">Activités enregistrées avec succès!</p>}
+            
+            <div className="flex gap-3 ml-auto">
+              <button 
+                type="button" 
+                onClick={onClose} 
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm transition-colors"
+              >
+                Annuler
+              </button>
+              <button 
+                type="submit" 
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm transition-colors flex items-center"
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Enregistrement...
+                  </>
+                ) : "Enregistrer"}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
