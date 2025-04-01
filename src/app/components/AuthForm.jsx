@@ -50,9 +50,6 @@ export default function AuthForm() {
       } else {
         setIsSigningUp(true);
       }
-    }
-    if (!error) {
-      setIsSigningUp(true)
     } else {
       setIsSigningUp(false)
     }

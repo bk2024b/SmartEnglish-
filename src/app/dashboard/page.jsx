@@ -32,7 +32,10 @@ export default function Dashboard() {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        setUser(user);
+        setUser({
+          ...user,
+          full_name: profile.full_name || user.email // Utilise l'email comme fallback
+        });
   
         // Vérifier si le coaching a commencé
         const startDate = new Date('2025-04-07');
@@ -131,7 +134,7 @@ export default function Dashboard() {
       {/* En-tête */}
       <header className="flex justify-between items-center py-3">
         <div className="flex flex-col">
-          <p className="text-sm text-gray-300">{user?.display_name || "Utilisateur inconnu"}</p>
+          <p className="text-sm text-gray-300">{user?.full_name || "Utilisateur inconnu"}</p>
           
           {coachingStarted && (
             <>
