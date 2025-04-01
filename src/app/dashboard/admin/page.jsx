@@ -99,10 +99,10 @@ export default function AdminDashboard() {
       }
       
       setLoading(false);
-    };
+    })
     
     fetchAdminData();
-  }, []);
+}[];;
   
   // Filtrer les apprenants en fonction du filtre sélectionné et de la recherche
   const filteredLearners = learners
@@ -376,4 +376,3 @@ export default function AdminDashboard() {
       />
     </main>
   );
-}
