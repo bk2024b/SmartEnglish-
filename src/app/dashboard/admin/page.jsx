@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from 'react';
 // import { supabase } from "../../utils/supabaseClient";
 import Link from 'next/link';
@@ -26,52 +25,48 @@ export default function AdminDashboard() {
       // Commenté : Vérification de l'utilisateur connecté avec supabase
       /*
       const { data: { user } } = await supabase.auth.getUser();
-      
       if (user) {
         setUser(user);
-        
         // Vérifier le rôle admin dans la table profiles
         //const { data: profile, error: profileError } = await supabase
-        //  .from('profiles')
+        // .from('profiles')
         // .select('role')
         // .eq('id', user.id)
         // .single();
-          
         //if (profileError || profile.role !== 'admin') {
         // console.error("Accès non autorisé");
         // Rediriger vers la page d'accueil ou afficher une erreur
         // return;
         //}
       */
-      
       // Pour le développement, on simule un utilisateur
       setUser({ email: "admin@example.com" });
-        
+
       // Calculer la semaine actuelle depuis le début du coaching (7 avril 2025)
       const startDate = new Date('2025-04-07');
       const currentDate = new Date();
       const diffTime = currentDate - startDate;
       const diffWeeks = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 7)) + 1);
       setWeekNumber(diffWeeks);
-      
+
       // Commenté : Récupération des données des apprenants depuis supabase
       /*
       const { data: learnersData, error: learnersError } = await supabase
         .from('profiles')
         .select(`
-          id, 
-          email, 
-          first_name, 
-          last_name, 
-          avatar, 
-          daysCompleted, 
-          totalDays, 
+          id,
+          email,
+          first_name,
+          last_name,
+          avatar,
+          daysCompleted,
+          totalDays,
           weekBadge,
           last_active,
           audio_submissions(count)
         `)
         .eq('role', 'learner');
-      
+
       if (learnersError) {
         console.error("Erreur lors de la récupération des apprenants:", learnersError);
       } else {
@@ -80,7 +75,7 @@ export default function AdminDashboard() {
           progressPercentage: Math.floor((learner.daysCompleted / learner.totalDays) * 100),
           audioSubmissionsCount: learner.audio_submissions.length
         })));
-        
+
         // Calculer les statistiques
         const today = new Date().setHours(0, 0, 0, 0);
         const activeToday = learnersData.filter(learner => 
@@ -103,7 +98,7 @@ export default function AdminDashboard() {
         });
       }
       */
-      
+
       // Pour le développement, on utilise des données fictives
       const mockLearners = [
         {
@@ -151,7 +146,6 @@ export default function AdminDashboard() {
       ];
       
       setLearners(mockLearners);
-      
       setStatistics({
         totalLearners: mockLearners.length,
         activeToday: mockLearners.filter(l => new Date(l.last_active).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0)).length,
@@ -163,7 +157,7 @@ export default function AdminDashboard() {
     };
     
     fetchAdminData();
-  }, []);  // Correction : fermé les crochets vides de useEffect
+  }, []);
   
   // Filtrer les apprenants en fonction du filtre sélectionné et de la recherche
   const filteredLearners = learners
@@ -201,15 +195,14 @@ export default function AdminDashboard() {
     <main className="min-h-screen bg-gray-100">
       {/* En-tête */}
       <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
-        <div className="container mx-auto py-4 px-6 flex justify-between items-center">
+        <div className="container mx-auto py-4 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-2xl font-bold">Dashboard Admin</h1>
-            <p className="text-sm opacity-90">Coaching d'anglais - Semaine {weekNumber}</p>
+            <h1 className="text-xl sm:text-2xl font-bold">Dashboard Admin</h1>
+            <p className="text-xs sm:text-sm opacity-90">Coaching d'anglais - Semaine {weekNumber}</p>
           </div>
-          
-          <div className="flex items-center">
-            <span className="mr-4">{user?.email}</span>
-            <Link href="/auth/signout" className="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <span className="text-sm sm:mr-4 truncate max-w-xs">{user?.email}</span>
+            <Link href="/auth/signout" className="bg-white text-blue-600 px-3 py-1 sm:px-4 sm:py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap">
               Déconnexion
             </Link>
           </div>
@@ -217,57 +210,53 @@ export default function AdminDashboard() {
       </header>
 
       {/* Section des statistiques */}
-      <section className="container mx-auto py-6 px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow p-5">
-            <h3 className="text-gray-500 text-sm font-medium">Apprenants inscrits</h3>
+      <section className="container mx-auto py-4 sm:py-6 px-4 sm:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Apprenants inscrits</h3>
             <div className="flex items-center">
-              <span className="text-3xl font-bold text-gray-800">{statistics.totalLearners}</span>
+              <span className="text-xl sm:text-3xl font-bold text-gray-800">{statistics.totalLearners}</span>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow p-5">
-            <h3 className="text-gray-500 text-sm font-medium">Actifs aujourd'hui</h3>
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Actifs aujourd'hui</h3>
             <div className="flex items-center">
-              <span className="text-3xl font-bold text-green-600">{statistics.activeToday}</span>
-              <span className="text-sm text-gray-500 ml-2">
+              <span className="text-xl sm:text-3xl font-bold text-green-600">{statistics.activeToday}</span>
+              <span className="text-xs sm:text-sm text-gray-500 ml-2">
                 ({Math.round((statistics.activeToday / statistics.totalLearners) * 100)}%)
               </span>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow p-5">
-            <h3 className="text-gray-500 text-sm font-medium">Taux de complétion moyen</h3>
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Taux de complétion moyen</h3>
             <div className="flex items-center">
-              <span className="text-3xl font-bold text-blue-600">{statistics.completionRate}%</span>
+              <span className="text-xl sm:text-3xl font-bold text-blue-600">{statistics.completionRate}%</span>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow p-5">
-            <h3 className="text-gray-500 text-sm font-medium">Enregistrements audio soumis</h3>
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Enregistrements audio soumis</h3>
             <div className="flex items-center">
-              <span className="text-3xl font-bold text-purple-600">{statistics.audioSubmissions}</span>
+              <span className="text-xl sm:text-3xl font-bold text-purple-600">{statistics.audioSubmissions}</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Section d'action */}
-      <section className="container mx-auto py-2 px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <div className="mb-4 md:mb-0">
-            <h2 className="text-xl font-bold text-gray-800">Gestion des apprenants</h2>
+      <section className="container mx-auto py-2 px-4 sm:px-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 gap-3">
+          <div className="mb-2 md:mb-0">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800">Gestion des apprenants</h2>
           </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button 
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <button
               onClick={() => setActivityFormOpen(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center"
+              className="bg-blue-600 text-white px-3 py-2 sm:px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center sm:justify-start text-sm"
             >
               <span className="mr-2">+</span>
               Définir les activités du jour
             </button>
-            <Link href="/admin/reports" className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">
+            <Link href="/admin/reports" className="bg-gray-200 text-gray-700 px-3 py-2 sm:px-4 rounded-md hover:bg-gray-300 transition-colors text-center sm:text-left text-sm">
               Rapports d'activité
             </Link>
           </div>
@@ -275,41 +264,40 @@ export default function AdminDashboard() {
       </section>
 
       {/* Section filtres et recherche */}
-      <section className="container mx-auto py-2 px-6">
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="flex flex-col md:flex-row justify-between space-y-3 md:space-y-0">
-            <div className="flex space-x-2">
-              <button 
+      <section className="container mx-auto py-2 px-4 sm:px-6">
+        <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="flex flex-col md:flex-row justify-between space-y-3 md:space-y-0 md:space-x-3">
+            <div className="flex flex-wrap gap-2">
+              <button
                 onClick={() => setSelectedFilter('all')}
-                className={`px-4 py-2 rounded-md text-sm ${selectedFilter === 'all' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'all' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 Tous
               </button>
-              <button 
+              <button
                 onClick={() => setSelectedFilter('active')}
-                className={`px-4 py-2 rounded-md text-sm ${selectedFilter === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 Actifs aujourd'hui
               </button>
-              <button 
+              <button
                 onClick={() => setSelectedFilter('at-risk')}
-                className={`px-4 py-2 rounded-md text-sm ${selectedFilter === 'at-risk' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'at-risk' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 À risque
               </button>
-              <button 
+              <button
                 onClick={() => setSelectedFilter('excellent')}
-                className={`px-4 py-2 rounded-md text-sm ${selectedFilter === 'excellent' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'excellent' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 Excellents
               </button>
             </div>
-            
-            <div className="relative">
+            <div className="relative w-full md:w-64">
               <input
                 type="text"
                 placeholder="Rechercher un apprenant..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full md:w-64"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -320,113 +308,117 @@ export default function AdminDashboard() {
       </section>
 
       {/* Liste des apprenants */}
-      <section className="container mx-auto py-2 px-6 mb-8">
+      <section className="container mx-auto py-2 px-4 sm:px-6 mb-8">
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Apprenant
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Progression
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Niveau
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Dernière activité
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Audio
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredLearners.length === 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                    {searchQuery ? 'Aucun apprenant ne correspond à votre recherche' : 'Aucun apprenant dans cette catégorie'}
-                  </td>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Apprenant
+                  </th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Progression
+                  </th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                    Niveau
+                  </th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    Dernière activité
+                  </th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                    Audio
+                  </th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ) : (
-                filteredLearners.map((learner) => {
-                  // Calculer le niveau en fonction du nombre de mois écoulés
-                  const startDate = new Date('2025-04-07');
-                  const currentDate = new Date();
-                  const diffTime = currentDate - startDate;
-                  const diffMonths = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 30)) + 1);
-                  const level = Math.min(diffMonths, 6);
-
-                  // Déterminer la couleur de la progression
-                  let progressColor;
-                  if (learner.progressPercentage < 40) progressColor = 'bg-red-500';
-                  else if (learner.progressPercentage < 70) progressColor = 'bg-yellow-500';
-                  else progressColor = 'bg-green-500';
-
-                  // Formater la date de dernière activité
-                  const lastActive = learner.last_active ? new Date(learner.last_active) : null;
-                  const today = new Date();
-                  const isToday = lastActive && lastActive.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0);
-                  const lastActiveFormatted = isToday 
-                    ? `Aujourd'hui ${lastActive.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` 
-                    : lastActive ? lastActive.toLocaleDateString('fr-FR') : 'Jamais';
-
-                  return (
-                    <tr key={learner.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 flex-shrink-0">
-                            <img 
-                              className="h-10 w-10 rounded-full object-cover"
-                              src={learner.avatar || "/avatars/stage1.jpg"}
-                              alt="Avatar de l'apprenant"
-                            />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {`${learner.first_name || ''} ${learner.last_name || ''}` || 'Apprenant sans nom'}
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredLearners.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-3 sm:px-6 py-4 text-center text-gray-500">
+                      {searchQuery ? 'Aucun apprenant ne correspond à votre recherche' : 'Aucun apprenant dans cette catégorie'}
+                    </td>
+                  </tr>
+                ) : (
+                  filteredLearners.map((learner) => {
+                    // Calculer le niveau en fonction du nombre de mois écoulés
+                    const startDate = new Date('2025-04-07');
+                    const currentDate = new Date();
+                    const diffTime = currentDate - startDate;
+                    const diffMonths = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 30)) + 1);
+                    const level = Math.min(diffMonths, 6);
+                    
+                    // Déterminer la couleur de la progression
+                    let progressColor;
+                    if (learner.progressPercentage < 40) progressColor = 'bg-red-500';
+                    else if (learner.progressPercentage < 70) progressColor = 'bg-yellow-500';
+                    else progressColor = 'bg-green-500';
+                    
+                    // Formater la date de dernière activité
+                    const lastActive = learner.last_active ? new Date(learner.last_active) : null;
+                    const today = new Date();
+                    const isToday = lastActive && lastActive.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0);
+                    const lastActiveFormatted = isToday
+                      ? `Aujourd'hui ${lastActive.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+                      : lastActive ? lastActive.toLocaleDateString('fr-FR') : 'Jamais';
+                    
+                    return (
+                      <tr key={learner.id}>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
+                              <img
+                                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover"
+                                src={learner.avatar || "/avatars/stage1.jpg"}
+                                alt="Avatar de l'apprenant"
+                              />
                             </div>
-                            <div className="text-sm text-gray-500">{learner.email}</div>
+                            <div className="ml-2 sm:ml-4">
+                              <div className="text-xs sm:text-sm font-medium text-gray-900 line-clamp-1">
+                                {`${learner.first_name || ''} ${learner.last_name || ''}` || 'Apprenant sans nom'}
+                              </div>
+                              <div className="text-xs sm:text-sm text-gray-500 line-clamp-1">{learner.email}</div>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-                            <div className={`h-2.5 rounded-full ${progressColor}`} style={{ width: `${learner.progressPercentage}%` }}></div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="w-16 sm:w-24 bg-gray-200 rounded-full h-2 mr-2">
+                              <div className={`h-2 rounded-full ${progressColor}`} style={{ width: `${learner.progressPercentage}%` }}></div>
+                            </div>
+                            <span className="text-xs sm:text-sm text-gray-500">{learner.progressPercentage}%</span>
                           </div>
-                          <span className="text-sm text-gray-500">{learner.progressPercentage}%</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          Niveau {level}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`text-sm ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
-                          {lastActiveFormatted}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {learner.audioSubmissionsCount || 0} soumissions
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Link href={`/admin/learner/${learner.id}`} className="text-blue-600 hover:text-blue-900 mr-3">
-                          Détails
-                        </Link>
-                        <button className="text-gray-600 hover:text-gray-900">Message</button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            Niveau {level}
+                          </span>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                          <span className={`text-xs sm:text-sm ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
+                            {lastActiveFormatted}
+                          </span>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
+                          {learner.audioSubmissionsCount || 0} soumissions
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
+                          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                            <Link href={`/admin/learner/${learner.id}`} className="text-blue-600 hover:text-blue-900">
+                              Détails
+                            </Link>
+                            <button className="text-gray-600 hover:text-gray-900">Message</button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
