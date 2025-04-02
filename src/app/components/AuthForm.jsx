@@ -4,38 +4,34 @@ import { supabase } from "../utils/supabaseClient.js";
 import { useRouter } from "next/navigation";
 
 export default function AuthForm() {
-  const [isNewUser, setIsNewUser] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const router = useRouter();
+  const [isNewUser, setIsNewUser] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [isSigningIn, setIsSigningIn] = useState(false)
+  const [isSigningUp, setIsSigningUp] = useState(false)
+  const router = useRouter()
 
   async function handleLogin(e) {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email, 
-      password
-    });
-
-    if (authError) {
-      setError(authError.message);
-      setIsLoading(false);
+    setIsSigningIn(true)
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email, password
+    })
+    console.log({ error, data })
+    if (!error) {
+      router.push('/dashboard')
     } else {
-      router.push('/dashboard');
+      setIsSigningIn(false)
     }
   }
 
   async function handleSignUp(e) {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+    setIsSigningUp(true);
     
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    // 1. Créer l'utilisateur
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -45,137 +41,145 @@ export default function AuthForm() {
       }
     });
     
-    if (signUpError) {
-      setError(signUpError.message);
-      setIsLoading(false);
+    if (error) {
+      console.error('Erreur lors de l\'inscription:', error);
+      setIsSigningUp(false);
       return;
     }
     
+    // 2. Connecter l'utilisateur immédiatement après l'inscription
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email, 
       password
     });
     
     if (signInError) {
-      setError(signInError.message);
-      setIsLoading(false);
+      console.error('Erreur lors de la connexion après inscription:', signInError);
+      setIsSigningUp(false);
       return;
     }
     
+    // Rediriger vers le dashboard
     router.push('/dashboard');
+    setIsSigningUp(false);
+  }
+
+  let signInMessage = 'Se connecter';
+  if (isSigningIn) {
+    signInMessage = 'Connexion...'
+  } else if (isNewUser) {
+    signInMessage = 'S\'inscrire'
   }
 
   return (
-    <div className="space-y-6 w-full">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-white">
-          {isNewUser ? 'Créer un compte' : 'Connectez-vous'}
-        </h2>
-        <p className="mt-2 text-white/80">
-          {isNewUser ? 'Commencez votre voyage linguistique' : 'Reprenez votre apprentissage'}
-        </p>
-      </div>
-
-      {error && (
-        <div className="bg-red-500/20 border border-red-500/50 text-red-100 px-4 py-3 rounded-lg">
-          {error}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-6 bg-white p-8 rounded-2xl shadow-xl">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-indigo-600 mb-2">SmartEnglish+</h1>
+          <p className="text-gray-600 text-lg">Bienvenue sur votre plateforme de suivi d'apprentissage</p>
+          <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
+            {isNewUser ? 'Créer un compte' : 'Connexion à votre compte'}
+          </h2>
         </div>
-      )}
-
-      <form onSubmit={isNewUser ? handleSignUp : handleLogin} className="space-y-5">
-        {isNewUser && (
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-white/80">Nom complet</label>
-            <div className="relative">
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent placeholder-white/30 transition-all duration-200"
-                placeholder="Prénom et Nom"
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="h-5 w-5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+        
+        <form onSubmit={isNewUser ? handleSignUp : handleLogin} className="mt-8 space-y-5">
+          <div className="space-y-4">
+            {isNewUser && (
+              <div>
+                <label htmlFor="full-name" className="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                <input
+                  id="full-name"
+                  name="fullName"
+                  type="text"
+                  required={isNewUser}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all duration-200"
+                  placeholder="Prénom et Nom"
+                />
               </div>
+            )}
+            
+            <div>
+              <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">Adresse email</label>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all duration-200"
+                placeholder="Adresse email"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all duration-200"
+                placeholder="Mot de passe"
+              />
             </div>
           </div>
-        )}
 
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-white/80">Adresse email</label>
-          <div className="relative">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent placeholder-white/30 transition-all duration-200"
-              placeholder="email@exemple.com"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="h-5 w-5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-white/80">Mot de passe</label>
-          <div className="relative">
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-transparent placeholder-white/30 transition-all duration-200"
-              placeholder="••••••••"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="h-5 w-5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full flex justify-center items-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${isLoading 
-              ? 'bg-cyan-400/80 cursor-not-allowed' 
-              : 'bg-cyan-400 hover:bg-cyan-300 shadow-lg hover:shadow-cyan-400/30'}`}
-          >
-            {isLoading ? (
-              <>
+          <div>
+            <button
+              type="submit"
+              disabled={isSigningIn || isSigningUp}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out disabled:bg-indigo-400 shadow-md hover:shadow-lg"
+            >
+              {isSigningIn || isSigningUp ? (
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {isNewUser ? 'Inscription...' : 'Connexion...'}
-              </>
-            ) : (
-              isNewUser ? 'S\'inscrire' : 'Se connecter'
-            )}
-          </button>
-        </div>
-      </form>
+              ) : null}
+              {signInMessage}
+            </button>
+          </div>
 
-      <div className="text-center text-sm text-white/70">
-        <button
-          type="button"
-          onClick={() => setIsNewUser(!isNewUser)}
-          className="font-medium text-cyan-300 hover:text-cyan-200 underline underline-offset-4 transition-colors"
-        >
-          {isNewUser 
-            ? 'Vous avez déjà un compte? Se connecter' 
-            : 'Pas encore de compte? S\'inscrire'}
-        </button>
+          <div className="text-sm text-center">
+            {isNewUser ? (
+              <p>
+                Vous avez déjà un compte? {' '}
+                <button
+                  type="button"
+                  onClick={() => setIsNewUser(false)}
+                  className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none transition-colors duration-200"
+                >
+                  Se connecter
+                </button>
+              </p>
+            ) : (
+              <p>
+                Vous n'avez pas de compte? {' '}
+                <button
+                  type="button"
+                  onClick={() => setIsNewUser(true)}
+                  className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none transition-colors duration-200"
+                >
+                  S'inscrire
+                </button>
+              </p>
+            )}
+          </div>
+
+          {isSigningUp && (
+            <div className="mt-4 p-4 bg-green-100 rounded-lg">
+              <p className="text-center text-green-800">
+                Email de confirmation envoyé ! Vérifiez votre mail pour confirmer votre inscription.
+              </p>
+            </div>
+          )}
+        </form>
       </div>
     </div>
-  );
+  )
 }
