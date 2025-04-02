@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import SignOutButton from "../../components/SignOutButton";
 import { supabase } from "../../utils/supabaseClient";
 import Link from 'next/link';
 import ActivitiesPopup from "../../components/ActivitiesPopup";
@@ -12,6 +11,7 @@ import MonthlyReportPopup from "../../components/MonthlyReportPopup";
 
 export default function TasksPage() {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [progress, setProgress] = useState({ daysCompleted: 0, totalDays: 180 });
   const [weekBadge, setWeekBadge] = useState(1);
   const [isReportOpen, setReportOpen] = useState(null); // 'daily', 'weekly', 'monthly' ou null
@@ -28,9 +28,23 @@ export default function TasksPage() {
     monthly: { completed: 0, total: 6 }
   };
 
+  // Fonction pour obtenir le suffixe ordinal en anglais (1st, 2nd, 3rd, etc.)
+  const getOrdinalSuffix = (num) => {
+    if (num % 100 >= 11 && num % 100 <= 13) {
+      return 'th';
+    }
+    switch (num % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+
   useEffect(() => {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (user) {
         setUser(user);
 
@@ -43,11 +57,13 @@ export default function TasksPage() {
         // Récupération des infos du profil
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('weekBadge, daysCompleted, totalDays, xp')
-          .eq('id', user.id)
+          .select('*')
+          .eq('user_id', user.id)  // Correction: user_id au lieu de id
           .single();
   
-        if (!error && profile) {
+        if (profile) {
+          setUserProfile(profile);
+          
           // Initialiser la progression
           setProgress({
             daysCompleted: profile.daysCompleted || 0,
@@ -75,7 +91,7 @@ export default function TasksPage() {
               await supabase
                 .from('profiles')
                 .update({ daysCompleted })
-                .eq('id', user.id);
+                .eq('user_id', user.id);  // Correction: user_id au lieu de id
             }
           }
           
@@ -83,6 +99,8 @@ export default function TasksPage() {
           const diffTime = currentDate - startDate;
           const diffWeeks = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 7)) + 1);
           setWeekBadge(diffWeeks);
+        } else {
+          console.error("Erreur lors de la récupération du profil:", error);
         }
       }
     };
@@ -91,13 +109,16 @@ export default function TasksPage() {
   }, []);
 
   const progressPercentage = Math.floor((progress.daysCompleted / progress.totalDays) * 100);
+  
+  // Obtenir le nom complet ou utiliser une valeur par défaut
+  const fullName = userProfile?.full_name || user?.user_metadata?.display_name || user?.email || "Utilisateur";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col justify-between relative p-4 pb-20">
       {/* En-tête */}
       <header className="flex justify-between items-center py-3">
         <div className="flex flex-col">
-          <p className="text-sm text-gray-300">{user?.email || "Utilisateur inconnu"}</p>
+          <p className="text-sm text-gray-300">{fullName}</p>
           
           {coachingStarted && (
             <>
@@ -119,12 +140,20 @@ export default function TasksPage() {
               <span>{xp || 0} XP</span>
             </div>
           )}
-          <button onClick={() => setAudioPopupOpen(true)} className="bg-red-600 rounded-full p-2 shadow-lg hover:bg-red-700 transition">
+          <button onClick={() => setAudioPopupOpen(true)} className="bg-red-600 rounded-full p-2 shadow-lg hover:bg-red-700 transition mr-3">
             <span className="text-lg">🎙️</span>
           </button>
-          <button onClick={() => {/* Action de déconnexion */}} className="ml-3 bg-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-600 transition">
-            <span className="text-lg">⏻</span>
-          </button>
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="bg-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-600 transition flex items-center justify-center"
+              aria-label="Se déconnecter"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" d="M3 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h7a1 1 0 1 0 0-2H4V5h6a1 1 0 1 0 0-2H3zm11.707 4.707a1 1 0 0 0-1.414-1.414l-3 3a1 1 0 0 0 0 1.414l3 3a1 1 0 0 0 1.414-1.414L13.414 11H17a1 1 0 1 0 0-2h-3.586l1.293-1.293z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </form>
         </div>
       </header>
 
@@ -228,9 +257,11 @@ export default function TasksPage() {
         )}
       </section>
 
-      {/* Semaine Badge - Séparé du menu */}
-      <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg border border-indigo-300 z-20">
-        Semaine {weekBadge}
+      {/* Badge de semaine - Nouveau design comme dans Dashboard */}
+      <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-700 rounded-lg px-5 py-2 shadow-lg border border-indigo-400 z-20">
+        <p className="text-sm font-bold text-white">
+          {weekBadge}<sup>{getOrdinalSuffix(weekBadge)}</sup> Week
+        </p>
       </div>
 
       {/* Pied de page : Menu de navigation */}
