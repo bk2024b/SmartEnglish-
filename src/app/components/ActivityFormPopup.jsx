@@ -79,35 +79,48 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
     setErrorMessage("");
 
     try {
-      // Organiser les fichiers par utilisateur
-      const timestamp = Date.now();
-      const fileExtension = audioBlob.type === 'audio/webm' ? 'webm' : 'mp3';
-      const filePath = `${userId}/${timestamp}.${fileExtension}`;
+      // Vérifier si l'utilisateur est authentifié
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Vous devez être connecté pour enregistrer des notes audio");
+      }
+
+      // Créer un nom de fichier unique
+      const fileName = `${userId}_${Date.now()}.webm`;
       
       // Upload le fichier audio au bucket
-      const { data, error } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('audio-recordings')
-        .upload(filePath, audioBlob);
+        .upload(fileName, audioBlob, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (error) throw error;
+      if (uploadError) throw uploadError;
 
       // Récupérer l'URL publique du fichier
       const { data: urlData } = await supabase.storage
         .from('audio-recordings')
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
-      // Enregistrer les métadonnées dans la base de données
+      if (!urlData || !urlData.publicUrl) {
+        throw new Error("Impossible de générer l'URL publique du fichier");
+      }
+
+      // Enregistrer dans la base de données
       const { error: dbError } = await supabase
         .from('audio_notes')
         .insert({
           user_id: userId,
           title: title,
-          file_path: filePath,
-          file_url: urlData.publicUrl,
-          created_at: new Date().toISOString()
+          file_path: fileName,
+          file_url: urlData.publicUrl
         });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error("Erreur base de données:", dbError);
+        throw new Error(`Erreur d'enregistrement en base de données: ${dbError.message}`);
+      }
 
       setSuccessMessage("Enregistrement audio sauvegardé avec succès!");
       setTimeout(() => {
@@ -115,8 +128,8 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
         onClose();
       }, 2000);
     } catch (error) {
-      console.error("Erreur lors de l'enregistrement de l'audio:", error);
-      setErrorMessage(`Erreur lors de la sauvegarde de l'enregistrement: ${error.message || error}`);
+      console.error("Erreur détaillée:", error);
+      setErrorMessage(`Erreur: ${error.message || "Problème inconnu lors de la sauvegarde"}`);
     } finally {
       setIsUploading(false);
     }
