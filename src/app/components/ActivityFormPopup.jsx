@@ -8,18 +8,34 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
     objectif_hebdomadaire: '',
     objectif_du_jour: '',
     conseil_du_jour: '',
-    activite_1_titre: '',
-    activite_1_consignes: '',
-    activite_2_titre: '',
-    activite_2_consignes: '',
-    activite_3_titre: '',
-    activite_3_consignes: ''
+    
+    // Activité du matin
+    activite_matin_duree: '15 min',
+    activite_matin_titre: '',
+    activite_matin_consigne_debutant: '',
+    activite_matin_consigne_intermediaire: '',
+    activite_matin_consigne_avance: '',
+    
+    // Activité du midi
+    activite_midi_duree: '15 min',
+    activite_midi_titre: '',
+    activite_midi_consigne_debutant: '',
+    activite_midi_consigne_intermediaire: '',
+    activite_midi_consigne_avance: '',
+    
+    // Activité du soir
+    activite_soir_duree: '30 min',
+    activite_soir_titre: '',
+    activite_soir_consigne_debutant: '',
+    activite_soir_consigne_intermediaire: '',
+    activite_soir_consigne_avance: ''
   });
   
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [activeTab, setActiveTab] = useState('objectifs');
+  const [activeActivityTab, setActiveActivityTab] = useState('matin');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,12 +66,24 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
           objectif_hebdomadaire: '',
           objectif_du_jour: '',
           conseil_du_jour: '',
-          activite_1_titre: '',
-          activite_1_consignes: '',
-          activite_2_titre: '',
-          activite_2_consignes: '',
-          activite_3_titre: '',
-          activite_3_consignes: ''
+          
+          activite_matin_duree: '15 min',
+          activite_matin_titre: '',
+          activite_matin_consigne_debutant: '',
+          activite_matin_consigne_intermediaire: '',
+          activite_matin_consigne_avance: '',
+          
+          activite_midi_duree: '15 min',
+          activite_midi_titre: '',
+          activite_midi_consigne_debutant: '',
+          activite_midi_consigne_intermediaire: '',
+          activite_midi_consigne_avance: '',
+          
+          activite_soir_duree: '30 min',
+          activite_soir_titre: '',
+          activite_soir_consigne_debutant: '',
+          activite_soir_consigne_intermediaire: '',
+          activite_soir_consigne_avance: ''
         });
         onClose();
         setSaveSuccess(false);
@@ -73,7 +101,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 animate-fadeIn">
-      <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-xl animate-scaleIn">
+      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl animate-scaleIn">
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 flex justify-between items-center">
           <h2 className="text-white font-bold text-lg">Définir les activités du jour</h2>
           <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">✕</button>
@@ -177,117 +205,307 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                 </div>
               </div>
             ) : (
-              <div className="space-y-6 animate-fadeIn">
-                {/* Activité 1 */}
-                <div className="border-l-4 border-blue-500 pl-3 pb-1">
-                  <h3 className="font-medium text-blue-600 mb-2">Activité 1</h3>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="activite_1_titre" className="block text-sm font-medium text-gray-700 mb-1">
-                      Titre
-                    </label>
-                    <input
-                      type="text"
-                      id="activite_1_titre"
-                      name="activite_1_titre"
-                      value={formData.activite_1_titre}
-                      onChange={handleChange}
-                      placeholder="Ex: Lecture du cours"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="activite_1_consignes" className="block text-sm font-medium text-gray-700 mb-1">
-                      Consignes
-                    </label>
-                    <textarea
-                      id="activite_1_consignes"
-                      name="activite_1_consignes"
-                      rows="2"
-                      value={formData.activite_1_consignes}
-                      onChange={handleChange}
-                      placeholder="Détaillez les instructions pour cette activité"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    ></textarea>
-                  </div>
+              <div className="animate-fadeIn">
+                {/* Onglets pour les moments de la journée */}
+                <div className="flex mb-4 border-b border-gray-200">
+                  <button 
+                    type="button"
+                    className={`py-2 px-4 text-sm font-medium ${activeActivityTab === 'matin' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+                    onClick={() => setActiveActivityTab('matin')}
+                  >
+                    Matin
+                  </button>
+                  <button 
+                    type="button"
+                    className={`py-2 px-4 text-sm font-medium ${activeActivityTab === 'midi' ? 'text-yellow-600 border-b-2 border-yellow-600' : 'text-gray-500'}`}
+                    onClick={() => setActiveActivityTab('midi')}
+                  >
+                    Midi
+                  </button>
+                  <button 
+                    type="button"
+                    className={`py-2 px-4 text-sm font-medium ${activeActivityTab === 'soir' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500'}`}
+                    onClick={() => setActiveActivityTab('soir')}
+                  >
+                    Soir
+                  </button>
                 </div>
-                
-                {/* Activité 2 */}
-                <div className="border-l-4 border-purple-500 pl-3 pb-1">
-                  <h3 className="font-medium text-purple-600 mb-2">Activité 2</h3>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="activite_2_titre" className="block text-sm font-medium text-gray-700 mb-1">
-                      Titre
-                    </label>
-                    <input
-                      type="text"
-                      id="activite_2_titre"
-                      name="activite_2_titre"
-                      value={formData.activite_2_titre}
-                      onChange={handleChange}
-                      placeholder="Ex: Exercice pratique"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    />
+
+                {/* Activité du Matin */}
+                {activeActivityTab === 'matin' && (
+                  <div className="space-y-4 border-l-4 border-blue-500 pl-4 pb-2 animate-fadeIn">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <label htmlFor="activite_matin_titre" className="block text-sm font-medium text-gray-700 mb-1">
+                          Titre de l'activité
+                        </label>
+                        <input
+                          type="text"
+                          id="activite_matin_titre"
+                          name="activite_matin_titre"
+                          value={formData.activite_matin_titre}
+                          onChange={handleChange}
+                          placeholder="Ex: Compréhension et extraction des expressions"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          required
+                        />
+                      </div>
+                      <div className="w-32">
+                        <label htmlFor="activite_matin_duree" className="block text-sm font-medium text-gray-700 mb-1">
+                          Durée
+                        </label>
+                        <input
+                          type="text"
+                          id="activite_matin_duree"
+                          name="activite_matin_duree"
+                          value={formData.activite_matin_duree}
+                          onChange={handleChange}
+                          placeholder="Ex: 15 min"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Consignes par niveau
+                      </label>
+                      
+                      <div className="mb-3 border rounded-lg p-3 bg-green-50">
+                        <label htmlFor="activite_matin_consigne_debutant" className="block text-sm font-medium text-green-700 mb-1">
+                          Niveau Débutant
+                        </label>
+                        <textarea
+                          id="activite_matin_consigne_debutant"
+                          name="activite_matin_consigne_debutant"
+                          rows="2"
+                          value={formData.activite_matin_consigne_debutant}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les débutants"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                          required
+                        ></textarea>
+                      </div>
+                      
+                      <div className="mb-3 border rounded-lg p-3 bg-blue-50">
+                        <label htmlFor="activite_matin_consigne_intermediaire" className="block text-sm font-medium text-blue-700 mb-1">
+                          Niveau Intermédiaire
+                        </label>
+                        <textarea
+                          id="activite_matin_consigne_intermediaire"
+                          name="activite_matin_consigne_intermediaire"
+                          rows="2"
+                          value={formData.activite_matin_consigne_intermediaire}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les intermédiaires"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          required
+                        ></textarea>
+                      </div>
+                      
+                      <div className="border rounded-lg p-3 bg-purple-50">
+                        <label htmlFor="activite_matin_consigne_avance" className="block text-sm font-medium text-purple-700 mb-1">
+                          Niveau Avancé
+                        </label>
+                        <textarea
+                          id="activite_matin_consigne_avance"
+                          name="activite_matin_consigne_avance"
+                          rows="2"
+                          value={formData.activite_matin_consigne_avance}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les avancés"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          required
+                        ></textarea>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <label htmlFor="activite_2_consignes" className="block text-sm font-medium text-gray-700 mb-1">
-                      Consignes
-                    </label>
-                    <textarea
-                      id="activite_2_consignes"
-                      name="activite_2_consignes"
-                      rows="2"
-                      value={formData.activite_2_consignes}
-                      onChange={handleChange}
-                      placeholder="Détaillez les instructions pour cette activité"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    ></textarea>
+                )}
+
+                {/* Activité du Midi */}
+                {activeActivityTab === 'midi' && (
+                  <div className="space-y-4 border-l-4 border-yellow-500 pl-4 pb-2 animate-fadeIn">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <label htmlFor="activite_midi_titre" className="block text-sm font-medium text-gray-700 mb-1">
+                          Titre de l'activité
+                        </label>
+                        <input
+                          type="text"
+                          id="activite_midi_titre"
+                          name="activite_midi_titre"
+                          value={formData.activite_midi_titre}
+                          onChange={handleChange}
+                          placeholder="Ex: Pratique du shadowing"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
+                          required
+                        />
+                      </div>
+                      <div className="w-32">
+                        <label htmlFor="activite_midi_duree" className="block text-sm font-medium text-gray-700 mb-1">
+                          Durée
+                        </label>
+                        <input
+                          type="text"
+                          id="activite_midi_duree"
+                          name="activite_midi_duree"
+                          value={formData.activite_midi_duree}
+                          onChange={handleChange}
+                          placeholder="Ex: 15 min"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Consignes par niveau
+                      </label>
+                      
+                      <div className="mb-3 border rounded-lg p-3 bg-green-50">
+                        <label htmlFor="activite_midi_consigne_debutant" className="block text-sm font-medium text-green-700 mb-1">
+                          Niveau Débutant
+                        </label>
+                        <textarea
+                          id="activite_midi_consigne_debutant"
+                          name="activite_midi_consigne_debutant"
+                          rows="2"
+                          value={formData.activite_midi_consigne_debutant}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les débutants"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                          required
+                        ></textarea>
+                      </div>
+                      
+                      <div className="mb-3 border rounded-lg p-3 bg-blue-50">
+                        <label htmlFor="activite_midi_consigne_intermediaire" className="block text-sm font-medium text-blue-700 mb-1">
+                          Niveau Intermédiaire
+                        </label>
+                        <textarea
+                          id="activite_midi_consigne_intermediaire"
+                          name="activite_midi_consigne_intermediaire"
+                          rows="2"
+                          value={formData.activite_midi_consigne_intermediaire}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les intermédiaires"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          required
+                        ></textarea>
+                      </div>
+                      
+                      <div className="border rounded-lg p-3 bg-purple-50">
+                        <label htmlFor="activite_midi_consigne_avance" className="block text-sm font-medium text-purple-700 mb-1">
+                          Niveau Avancé
+                        </label>
+                        <textarea
+                          id="activite_midi_consigne_avance"
+                          name="activite_midi_consigne_avance"
+                          rows="2"
+                          value={formData.activite_midi_consigne_avance}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les avancés"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          required
+                        ></textarea>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Activité 3 */}
-                <div className="border-l-4 border-green-500 pl-3 pb-1">
-                  <h3 className="font-medium text-green-600 mb-2">Activité 3</h3>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="activite_3_titre" className="block text-sm font-medium text-gray-700 mb-1">
-                      Titre
-                    </label>
-                    <input
-                      type="text"
-                      id="activite_3_titre"
-                      name="activite_3_titre"
-                      value={formData.activite_3_titre}
-                      onChange={handleChange}
-                      placeholder="Ex: Quiz d'évaluation"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    />
+                )}
+
+                {/* Activité du Soir */}
+                {activeActivityTab === 'soir' && (
+                  <div className="space-y-4 border-l-4 border-purple-500 pl-4 pb-2 animate-fadeIn">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <label htmlFor="activite_soir_titre" className="block text-sm font-medium text-gray-700 mb-1">
+                          Titre de l'activité
+                        </label>
+                        <input
+                          type="text"
+                          id="activite_soir_titre"
+                          name="activite_soir_titre"
+                          value={formData.activite_soir_titre}
+                          onChange={handleChange}
+                          placeholder="Ex: Application et mise en pratique"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          required
+                        />
+                      </div>
+                      <div className="w-32">
+                        <label htmlFor="activite_soir_duree" className="block text-sm font-medium text-gray-700 mb-1">
+                          Durée
+                        </label>
+                        <input
+                          type="text"
+                          id="activite_soir_duree"
+                          name="activite_soir_duree"
+                          value={formData.activite_soir_duree}
+                          onChange={handleChange}
+                          placeholder="Ex: 30 min"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Consignes par niveau
+                      </label>
+                      
+                      <div className="mb-3 border rounded-lg p-3 bg-green-50">
+                        <label htmlFor="activite_soir_consigne_debutant" className="block text-sm font-medium text-green-700 mb-1">
+                          Niveau Débutant
+                        </label>
+                        <textarea
+                          id="activite_soir_consigne_debutant"
+                          name="activite_soir_consigne_debutant"
+                          rows="2"
+                          value={formData.activite_soir_consigne_debutant}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les débutants"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                          required
+                        ></textarea>
+                      </div>
+                      
+                      <div className="mb-3 border rounded-lg p-3 bg-blue-50">
+                        <label htmlFor="activite_soir_consigne_intermediaire" className="block text-sm font-medium text-blue-700 mb-1">
+                          Niveau Intermédiaire
+                        </label>
+                        <textarea
+                          id="activite_soir_consigne_intermediaire"
+                          name="activite_soir_consigne_intermediaire"
+                          rows="2"
+                          value={formData.activite_soir_consigne_intermediaire}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les intermédiaires"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          required
+                        ></textarea>
+                      </div>
+                      
+                      <div className="border rounded-lg p-3 bg-purple-50">
+                        <label htmlFor="activite_soir_consigne_avance" className="block text-sm font-medium text-purple-700 mb-1">
+                          Niveau Avancé
+                        </label>
+                        <textarea
+                          id="activite_soir_consigne_avance"
+                          name="activite_soir_consigne_avance"
+                          rows="2"
+                          value={formData.activite_soir_consigne_avance}
+                          onChange={handleChange}
+                          placeholder="Consignes pour les avancés"
+                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          required
+                        ></textarea>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <label htmlFor="activite_3_consignes" className="block text-sm font-medium text-gray-700 mb-1">
-                      Consignes
-                    </label>
-                    <textarea
-                      id="activite_3_consignes"
-                      name="activite_3_consignes"
-                      rows="2"
-                      value={formData.activite_3_consignes}
-                      onChange={handleChange}
-                      placeholder="Détaillez les instructions pour cette activité"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    ></textarea>
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </div>

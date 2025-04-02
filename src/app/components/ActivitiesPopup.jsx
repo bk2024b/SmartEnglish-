@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabaseClient'; // Import du client Supabase
+import { supabase } from '../utils/supabaseClient';
 
 export default function ActivitiesPopup({ isOpen, onClose }) {
   const [activitiesData, setActivitiesData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('objectifs');
+  const [niveau, setNiveau] = useState('debutant');
 
-  useEffect(() => {
-    if (!isOpen) return; // Ne charge les données que si le popup est ouvert
+  useEffect(() => { 
+    if (!isOpen) return;
 
     async function fetchActivities() {
       setLoading(true);
       const { data, error } = await supabase
-        .from('activities') // Remplace par le nom de ta table Supabase
+        .from('activities')
         .select('*')
-        .order('created_at', { ascending: false }) // Trier du plus récent au plus ancien
+        .order('created_at', { ascending: false })
 
       if (error) {
         console.error('Erreur de chargement des activités:', error);
       } else {
-        setActivitiesData(data[0]); // Supposons qu'on récupère la dernière activité
+        setActivitiesData(data[0]); // Récupère la dernière activité
       }
       setLoading(false);
     }
 
     fetchActivities();
-  }, [isOpen]); // Recharge les données à chaque ouverture du popup
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -37,18 +38,31 @@ export default function ActivitiesPopup({ isOpen, onClose }) {
     );
   }
 
+  // Données par défaut si aucune donnée n'est disponible
   const data = activitiesData || {
     date: new Date().toISOString().split('T')[0],
-    objectif_mensuel: "Terminer 3 modules de formation",
-    objectif_hebdomadaire: "Compléter 2 exercices pratiques",
-    objectif_du_jour: "Visionner la vidéo introductive et prendre des notes",
-    conseil_du_jour: "Prenez 5 minutes pour réviser vos notes d'hier avant de commencer",
-    activite_1_titre: "Lecture du cours",
-    activite_1_consignes: "Lire le chapitre 3 sur les fondamentaux",
-    activite_2_titre: "Exercice pratique",
-    activite_2_consignes: "Compléter l'exercice 2.1 dans votre cahier de travail",
-    activite_3_titre: "Quiz d'évaluation",
-    activite_3_consignes: "Répondre au quiz en ligne pour valider vos connaissances"
+    objectif_mensuel: "Maîtriser les expressions courantes",
+    objectif_hebdomadaire: "S'exprimer avec fluidité dans des conversations simples",
+    objectif_du_jour: "Apprendre et utiliser des expressions en contexte",
+    conseil_du_jour: "L'immersion est la clé ! Écoute, répète et applique.",
+    
+    activite_matin_duree: "15 min",
+    activite_matin_titre: "Compréhension et extraction des expressions",
+    activite_matin_consigne_debutant: "Note 3 expressions simples que tu comprends facilement",
+    activite_matin_consigne_intermediaire: "Note 5 expressions, y compris des phrasal verbs ou expressions idiomatiques",
+    activite_matin_consigne_avance: "Identifie 7 expressions ou tournures complexes et cherche à en comprendre l'usage précis",
+    
+    activite_midi_duree: "15 min",
+    activite_midi_titre: "Pratique du shadowing",
+    activite_midi_consigne_debutant: "Répète mot pour mot après l'audio en insistant sur la prononciation.",
+    activite_midi_consigne_intermediaire: "Joue avec l'intonation et le rythme pour rendre ton imitation plus naturelle.",
+    activite_midi_consigne_avance: "Imite non seulement la prononciation, mais aussi l'émotion et le ton du locuteur.",
+    
+    activite_soir_duree: "30 min",
+    activite_soir_titre: "Application et mise en pratique",
+    activite_soir_consigne_debutant: "Écris un mini-dialogue de 4 répliques intégrant les expressions et joue-le devant un miroir ou en t'enregistrant.",
+    activite_soir_consigne_intermediaire: "Écris un dialogue plus fluide et ajoute une mini-situation (ex. : rencontre entre collègues).",
+    activite_soir_consigne_avance: "Improvise un dialogue plus long, en y intégrant des nuances et des expressions adaptées au ton de la conversation. Joue-le en variant les émotions."
   };
 
   return (
@@ -77,6 +91,7 @@ export default function ActivitiesPopup({ isOpen, onClose }) {
           </button>
         </div>
 
+        {/* Contenu principal */}
         <div className="p-4 overflow-y-auto max-h-[70vh]">
           {activeTab === 'objectifs' ? (
             <div className="space-y-4 animate-fadeIn">
@@ -101,10 +116,52 @@ export default function ActivitiesPopup({ isOpen, onClose }) {
               </div>
             </div>
           ) : (
-            <div className="space-y-4 animate-fadeIn">
-              <ActivityCard number={1} title={data.activite_1_titre} instructions={data.activite_1_consignes} />
-              <ActivityCard number={2} title={data.activite_2_titre} instructions={data.activite_2_consignes} />
-              <ActivityCard number={3} title={data.activite_3_titre} instructions={data.activite_3_consignes} />
+            <div className="animate-fadeIn">
+              {/* Sélecteur de niveau pour les activités */}
+              <div className="mb-4 flex justify-center space-x-2">
+                <button 
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${niveau === 'debutant' ? 'bg-green-500 text-white' : 'bg-gray-600 text-gray-300'}`}
+                  onClick={() => setNiveau('debutant')}
+                >
+                  Débutant
+                </button>
+                <button 
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${niveau === 'intermediaire' ? 'bg-blue-500 text-white' : 'bg-gray-600 text-gray-300'}`}
+                  onClick={() => setNiveau('intermediaire')}
+                >
+                  Intermédiaire
+                </button>
+                <button 
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${niveau === 'avance' ? 'bg-purple-500 text-white' : 'bg-gray-600 text-gray-300'}`}
+                  onClick={() => setNiveau('avance')}
+                >
+                  Avancé
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <TimeBasedActivityCard 
+                  time="Matin" 
+                  duration={data.activite_matin_duree} 
+                  title={data.activite_matin_titre} 
+                  instructions={data[`activite_matin_consigne_${niveau}`]}
+                  color="blue"
+                />
+                <TimeBasedActivityCard 
+                  time="Midi" 
+                  duration={data.activite_midi_duree} 
+                  title={data.activite_midi_titre} 
+                  instructions={data[`activite_midi_consigne_${niveau}`]}
+                  color="yellow"
+                />
+                <TimeBasedActivityCard 
+                  time="Soir" 
+                  duration={data.activite_soir_duree} 
+                  title={data.activite_soir_titre} 
+                  instructions={data[`activite_soir_consigne_${niveau}`]}
+                  color="purple"
+                />
+              </div>
             </div>
           )}
         </div>
@@ -119,20 +176,23 @@ export default function ActivitiesPopup({ isOpen, onClose }) {
   );
 }
 
-function ActivityCard({ number, title, instructions }) {
+function TimeBasedActivityCard({ time, duration, title, instructions, color }) {
   const [expanded, setExpanded] = useState(false);
   
-  const colors = {
-    1: 'from-blue-500 to-blue-600',
-    2: 'from-purple-500 to-purple-600',
-    3: 'from-green-500 to-green-600',
+  const colorMap = {
+    'blue': 'from-blue-500 to-blue-600',
+    'yellow': 'from-yellow-500 to-yellow-600',
+    'purple': 'from-purple-500 to-purple-600',
+    'green': 'from-green-500 to-green-600',
   };
+  
+  const bgGradient = colorMap[color] || 'from-blue-500 to-blue-600';
   
   return (
     <div className="bg-gray-700 bg-opacity-30 rounded-lg overflow-hidden">
-      <div className={`bg-gradient-to-r ${colors[number]} px-4 py-3 flex justify-between items-center cursor-pointer`} onClick={() => setExpanded(!expanded)}>
+      <div className={`bg-gradient-to-r ${bgGradient} px-4 py-3 flex justify-between items-center cursor-pointer`} onClick={() => setExpanded(!expanded)}>
         <h3 className="font-medium text-white flex items-center">
-          <span className="bg-white text-gray-800 rounded-full w-6 h-6 flex items-center justify-center mr-2 text-xs font-bold">{number}</span>
+          <span className="bg-white text-gray-800 rounded-full px-2 py-1 mr-2 text-xs font-bold">{time} • {duration}</span>
           {title}
         </h3>
         <span className="text-white text-lg">{expanded ? '−' : '+'}</span>
