@@ -14,7 +14,6 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
     overcoming_strategies: '',
     confidence_score: '',
     profile_id: null,
-    xp_points: 0, // Initialisez avec 0, pas avec xpEarned
   });
 
   const [loading, setLoading] = useState(false);
@@ -56,12 +55,6 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
     setLoading(true);
     setErrorMessage('');
 
-    const xpEarned = calculateXP(formData);  // Calculer les XP après soumission du formulaire
-    setFormData(prevData => ({
-      ...prevData,
-      xp_points: xpEarned, // Mettre à jour xp_points
-    }));
-
     const { error } = await supabase.from('daily_progress').insert([formData]);
 
     if (error) {
@@ -71,36 +64,9 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
       console.log("Rapport enregistré !");
       onClose();
     }
-
-    // Mettre à jour le total XP dans le profil utilisateur
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update( { xp: xpEarned + formData.profile_id.xp })
-      .eq("id", formData.profile_id); 
-
-    if (profileError) {
-      console.error("Erreur lors de la mise à jour des XP :", profileError);
-    }
-    console.log("Rapport enregistré avec XP :", xpEarned);
     
     setLoading(false);
     onClose();
-  };
-
-  // Fonction de calcul des XP
-  const calculateXP = (formData) => {
-    let xp = 10; // XP de base
-
-    if (formData.time_spent === "Plus de 1h") xp += 15;
-    else if (formData.time_spent === "1h") xp += 10;
-    else if (formData.time_spent === "30-45 min") xp += 5;
-
-    xp += formData.activities_done.length * 5; // 5 XP par activité réalisée
-
-    if (formData.new_expressions_count === "3-5") xp += 5;
-    else if (formData.new_expressions_count === "Plus de 5") xp += 10;
-
-    return xp;
   };
 
   return (
@@ -109,15 +75,12 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
         {/* En-tête du popup */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3 flex justify-between items-center sticky top-0 z-10">
           <h2 className="text-white font-bold text-lg">Rapport Quotidien</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-blue-100 text-xs bg-blue-700 px-2 py-1 rounded-full">+10 XP</span>
-            <button 
-              onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors"
-            >
-              ✕
-            </button>
-          </div>
+          <button 
+            onClick={onClose}
+            className="text-white hover:text-gray-200 transition-colors"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Formulaire avec animation de défilement fluide */}

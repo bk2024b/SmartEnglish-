@@ -59,18 +59,8 @@ export default function AuthForm() {
       return;
     }
     
-    // 3. Maintenant que l'utilisateur est authentifié, insérer dans profiles
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert([{ user_id: data.user.id, full_name: fullName }]);
-    
-    if (profileError) {
-      console.error('Erreur lors de l\'insertion du profil:', profileError);
-    } else {
-      // Rediriger vers le dashboard ou afficher un message de succès
-      router.push('/dashboard');
-    }
-    
+    // Rediriger vers le dashboard
+    router.push('/dashboard');
     setIsSigningUp(false);
   }
 

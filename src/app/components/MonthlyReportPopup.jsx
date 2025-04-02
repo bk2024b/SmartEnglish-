@@ -44,24 +44,6 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
       fetchUserData();
     }, []);
 
-  const updateAvatar = async () => {
-    // Trouver l'index actuel de l'avatar
-    const currentIndex = avatars.indexOf(avatarUrl);
-    const nextIndex = Math.min(currentIndex + 1, avatars.length - 1);
-    const newAvatar = avatars[nextIndex];
-  
-    // Mise à jour dans Supabase
-    const { error } = await supabase
-      .from('profiles')
-      .update({ avatar: newAvatar })
-      .eq('id', user.id);
-  
-    if (error) {
-      console.error("Erreur lors de la mise à jour de l'avatar:", error);
-    } else {
-      setAvatarUrl(newAvatar); // Mise à jour de l'état local
-    }
-  };
   // Gestion des changements dans le formulaire
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -71,7 +53,6 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
     }));
   };
   
-
   // Soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,7 +66,6 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
       if (error) throw error;
       
       // Afficher le message de succès
-      updateAvatar();
       alert("Bilan mensuel enregistré avec succès !");
       onClose();
       
@@ -102,7 +82,6 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
         <div className="bg-gradient-to-r from-green-600 to-teal-500 px-4 py-3 flex justify-between items-center sticky top-0 z-10">
           <h2 className="text-white font-bold text-lg">Bilan Mensuel</h2>
           <div className="flex items-center gap-3">
-            <span className="text-green-100 text-xs bg-green-700 px-2 py-1 rounded-full">+100 XP</span>
             <button 
               onClick={onClose}
               className="text-white hover:text-gray-200 transition-colors"

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { useEffect } from 'react';
 
-
 export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
   // Si le popup n'est pas ouvert, ne rien afficher
   if (!isOpen) return null;
@@ -85,10 +84,7 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
     setIsSubmitting(true);
     setSubmitError(null);
    
-    
     try {
-     
-      
       // Envoyer les données à Supabase
       const { data, error } = await supabase
         .from('weekly_progress')
@@ -118,15 +114,12 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
         {/* En-tête du popup */}
         <div className="bg-gradient-to-r from-purple-600 to-purple-500 px-4 py-3 flex justify-between items-center sticky top-0 z-10">
           <h2 className="text-white font-bold text-lg">Rapport Hebdomadaire</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-purple-100 text-xs bg-purple-700 px-2 py-1 rounded-full">+50 XP</span>
-            <button 
-              onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors"
-            >
-              x
-            </button>
-          </div>
+          <button 
+            onClick={onClose}
+            className="text-white hover:text-gray-200 transition-colors"
+          >
+            x
+          </button>
         </div>
 
         {/* Formulaire avec animation de défilement fluide */}
