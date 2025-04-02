@@ -216,7 +216,7 @@ export default function Dashboard() {
       <footer className="fixed bottom-0 left-0 right-0 flex justify-around items-center py-5 px-4 bg-gray-900 rounded-t-3xl shadow-lg">
         <Link href="/dashboard/tasks" className="text-center w-1/3 transition-transform hover:scale-110">
           <span className="block text-lg mb-1">📋</span>
-          <span className="text-sm font-medium">Tâches</span>
+          <span className="text-sm font-medium">Formulaires</span>
         </Link>
         <Link href="/dashboard" className="text-center w-1/3 block transition-transform hover:scale-110">
           <span className="block text-lg mb-1">🏠</span>
