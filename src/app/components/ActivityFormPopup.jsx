@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { supabase } from "../utils/supabaseClient";
 
 export default function AudioUploadPopup({ isOpen, onClose, userId }) {
@@ -11,32 +11,10 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
   
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const fileInputRef = useRef(null);
-
-  // Récupérer l'utilisateur actuel au chargement du composant
-  useEffect(() => {
-    const getCurrentUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      
-      if (error) {
-        console.error("Erreur lors de la récupération de l'utilisateur:", error);
-        setErrorMessage("Impossible de vérifier votre identité. Veuillez vous reconnecter.");
-        return;
-      }
-      
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setErrorMessage("Vous devez être connecté pour enregistrer des notes vocales.");
-      }
-    };
-    
-    getCurrentUser();
-  }, []);
 
   // Démarrer l'enregistrement
   const startRecording = async () => {
@@ -97,43 +75,37 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
       return;
     }
 
-    // Vérifier si l'utilisateur est connecté
-    if (!currentUser) {
-      setErrorMessage("Vous devez être connecté pour enregistrer des notes vocales.");
-      return;
-    }
-
-    const actualUserId = currentUser.id;
-
     setIsUploading(true);
     setErrorMessage("");
 
     try {
-      const fileName = `${actualUserId}_${Date.now()}.webm`;
+      // Organiser les fichiers par utilisateur
+      const timestamp = Date.now();
+      const fileExtension = audioBlob.type === 'audio/webm' ? 'webm' : 'mp3';
+      const filePath = `${userId}/${timestamp}.${fileExtension}`;
       
-      // Upload le fichier audio au bucket avec la session authentifiée
+      // Upload le fichier audio au bucket
       const { data, error } = await supabase.storage
         .from('audio-recordings')
-        .upload(fileName, audioBlob);
+        .upload(filePath, audioBlob);
 
       if (error) throw error;
 
       // Récupérer l'URL publique du fichier
       const { data: urlData } = await supabase.storage
         .from('audio-recordings')
-        .getPublicUrl(fileName);
+        .getPublicUrl(filePath);
 
       // Enregistrer les métadonnées dans la base de données
       const { error: dbError } = await supabase
         .from('audio_notes')
         .insert({
-          user_id: actualUserId,
+          user_id: userId,
           title: title,
-          file_path: fileName,
+          file_path: filePath,
           file_url: urlData.publicUrl,
           created_at: new Date().toISOString()
-        })
-        .select();
+        });
 
       if (dbError) throw dbError;
 
@@ -144,7 +116,7 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
       }, 2000);
     } catch (error) {
       console.error("Erreur lors de l'enregistrement de l'audio:", error);
-      setErrorMessage(`Erreur lors de la sauvegarde: ${error.message || error}`);
+      setErrorMessage(`Erreur lors de la sauvegarde de l'enregistrement: ${error.message || error}`);
     } finally {
       setIsUploading(false);
     }
