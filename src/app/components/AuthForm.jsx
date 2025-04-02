@@ -28,40 +28,22 @@ export default function AuthForm() {
 
   async function handleSignUp(e) {
     e.preventDefault();
-    setIsSigningUp(true);
-    
-    // 1. Créer l'utilisateur
+    setIsSigningUp(true)
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          display_name: fullName
+          full_name: fullName
         }
       }
-    });
-    
-    if (error) {
-      console.error('Erreur lors de l\'inscription:', error);
-      setIsSigningUp(false);
-      return;
+    })
+    if (!error) {
+      setIsSigningUp(true)
+    } else {
+      setIsSigningUp(false)
     }
-    
-    // 2. Connecter l'utilisateur immédiatement après l'inscription
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email, 
-      password
-    });
-    
-    if (signInError) {
-      console.error('Erreur lors de la connexion après inscription:', signInError);
-      setIsSigningUp(false);
-      return;
-    }
-    
-    // Rediriger vers le dashboard
-    router.push('/dashboard');
-    setIsSigningUp(false);
+    console.log({data, error})
   }
 
   let signInMessage = 'Se connecter';
