@@ -64,22 +64,7 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
   };
 
   // Sauvegarder l'audio
-    const saveAudio = async () => {
-        // Récupérer l'URL publique du fichier
-      const { data: urlData } = supabase.storage
-      .from('audio-recordings')
-      .getPublicUrl(fileName);
-        const fileName = `${userId}_${Date.now()}.webm`;
-        const { error: dbError } = await supabase
-        .from('audio_notes')
-        .insert({
-        user_id: userId,
-        title: title,
-        file_path: fileName, // fileName is not defined yet!
-        file_url: urlData.publicUrl, // urlData is not defined yet!
-        created_at: new Date().toISOString()
-        })
-    .select();
+  const saveAudio = async () => {
     if (!audioBlob) {
       setErrorMessage("Aucun audio à enregistrer");
       return;
@@ -95,6 +80,8 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
 
     try {
       const fileName = `${userId}_${Date.now()}.webm`;
+      
+      // Upload le fichier audio au bucket
       const { data, error } = await supabase.storage
         .from('audio-recordings')
         .upload(fileName, audioBlob);
@@ -102,7 +89,7 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
       if (error) throw error;
 
       // Récupérer l'URL publique du fichier
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = await supabase.storage
         .from('audio-recordings')
         .getPublicUrl(fileName);
 
@@ -116,7 +103,7 @@ export default function AudioUploadPopup({ isOpen, onClose, userId }) {
           file_url: urlData.publicUrl,
           created_at: new Date().toISOString()
         })
-        .select(); // Ajoutez .select() pour contourner certaines limitations RLS
+        .select();
 
       if (dbError) throw dbError;
 
