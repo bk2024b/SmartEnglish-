@@ -28,7 +28,9 @@ export default function AuthForm() {
 
   async function handleSignUp(e) {
     e.preventDefault();
-    setIsSigningUp(true)
+    setIsSigningUp(true);
+    
+    // 1. Créer l'utilisateur
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -37,23 +39,39 @@ export default function AuthForm() {
           display_name: fullName
         }
       }
-    })
-    if (!error) {
-      // Insérer le nom dans la table profiles
-      const { user } = data;
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([{ user_id: user.id, full_name: fullName }]);
+    });
     
-      if (profileError) {
-        console.error('Erreur lors de l\'insertion du profil:', profileError);
-      } else {
-        setIsSigningUp(true);
-      }
-    } else {
-      setIsSigningUp(false)
+    if (error) {
+      console.error('Erreur lors de l\'inscription:', error);
+      setIsSigningUp(false);
+      return;
     }
-    console.log({data, error})
+    
+    // 2. Connecter l'utilisateur immédiatement après l'inscription
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email, 
+      password
+    });
+    
+    if (signInError) {
+      console.error('Erreur lors de la connexion après inscription:', signInError);
+      setIsSigningUp(false);
+      return;
+    }
+    
+    // 3. Maintenant que l'utilisateur est authentifié, insérer dans profiles
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([{ user_id: data.user.id, full_name: fullName }]);
+    
+    if (profileError) {
+      console.error('Erreur lors de l\'insertion du profil:', profileError);
+    } else {
+      // Rediriger vers le dashboard ou afficher un message de succès
+      router.push('/dashboard');
+    }
+    
+    setIsSigningUp(false);
   }
 
   let signInMessage = 'Se connecter';
