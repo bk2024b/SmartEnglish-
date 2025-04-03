@@ -99,6 +99,10 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  // Style personnalisé pour tous les champs de saisie
+  const inputStyle = "block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 text-gray-900";
+  const textareaStyle = "block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 text-gray-900";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 animate-fadeIn">
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl animate-scaleIn">
@@ -133,7 +137,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className={inputStyle}
                 required
               />
             </div>
@@ -151,7 +155,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                     value={formData.objectif_mensuel}
                     onChange={handleChange}
                     placeholder="Définir l'objectif mensuel pour les apprenants"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className={textareaStyle}
                     required
                   ></textarea>
                 </div>
@@ -167,7 +171,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                     value={formData.objectif_hebdomadaire}
                     onChange={handleChange}
                     placeholder="Définir l'objectif hebdomadaire pour les apprenants"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className={textareaStyle}
                     required
                   ></textarea>
                 </div>
@@ -183,7 +187,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                     value={formData.objectif_du_jour}
                     onChange={handleChange}
                     placeholder="Définir l'objectif du jour pour les apprenants"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className={textareaStyle}
                     required
                   ></textarea>
                 </div>
@@ -199,7 +203,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                     value={formData.conseil_du_jour}
                     onChange={handleChange}
                     placeholder="Donner un conseil pratique aux apprenants"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className={textareaStyle}
                     required
                   ></textarea>
                 </div>
@@ -246,7 +250,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_matin_titre}
                           onChange={handleChange}
                           placeholder="Ex: Compréhension et extraction des expressions"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className={inputStyle}
                           required
                         />
                       </div>
@@ -261,7 +265,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_matin_duree}
                           onChange={handleChange}
                           placeholder="Ex: 15 min"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className={inputStyle}
                           required
                         />
                       </div>
@@ -283,7 +287,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_matin_consigne_debutant}
                           onChange={handleChange}
                           placeholder="Consignes pour les débutants"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -299,7 +303,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_matin_consigne_intermediaire}
                           onChange={handleChange}
                           placeholder="Consignes pour les intermédiaires"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -315,7 +319,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_matin_consigne_avance}
                           onChange={handleChange}
                           placeholder="Consignes pour les avancés"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -338,7 +342,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_midi_titre}
                           onChange={handleChange}
                           placeholder="Ex: Pratique du shadowing"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
+                          className={inputStyle}
                           required
                         />
                       </div>
@@ -353,7 +357,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_midi_duree}
                           onChange={handleChange}
                           placeholder="Ex: 15 min"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
+                          className={inputStyle}
                           required
                         />
                       </div>
@@ -375,7 +379,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_midi_consigne_debutant}
                           onChange={handleChange}
                           placeholder="Consignes pour les débutants"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -391,7 +395,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_midi_consigne_intermediaire}
                           onChange={handleChange}
                           placeholder="Consignes pour les intermédiaires"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -407,7 +411,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_midi_consigne_avance}
                           onChange={handleChange}
                           placeholder="Consignes pour les avancés"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -430,7 +434,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_soir_titre}
                           onChange={handleChange}
                           placeholder="Ex: Application et mise en pratique"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          className={inputStyle}
                           required
                         />
                       </div>
@@ -445,7 +449,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_soir_duree}
                           onChange={handleChange}
                           placeholder="Ex: 30 min"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          className={inputStyle}
                           required
                         />
                       </div>
@@ -467,7 +471,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_soir_consigne_debutant}
                           onChange={handleChange}
                           placeholder="Consignes pour les débutants"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -483,7 +487,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_soir_consigne_intermediaire}
                           onChange={handleChange}
                           placeholder="Consignes pour les intermédiaires"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
@@ -499,7 +503,7 @@ export default function ActivityFormPopup({ isOpen, onClose }) {
                           value={formData.activite_soir_consigne_avance}
                           onChange={handleChange}
                           placeholder="Consignes pour les avancés"
-                          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                          className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 py-2 px-3 text-gray-900"
                           required
                         ></textarea>
                       </div>
