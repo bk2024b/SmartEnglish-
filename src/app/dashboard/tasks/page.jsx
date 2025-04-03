@@ -11,15 +11,12 @@ import MonthlyReportPopup from "../../components/MonthlyReportPopup";
 
 export default function TasksPage() {
   const [user, setUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
   const [progress, setProgress] = useState({ daysCompleted: 0, totalDays: 180 });
-  const [weekBadge, setWeekBadge] = useState(1);
   const [isReportOpen, setReportOpen] = useState(null); // 'daily', 'weekly', 'monthly' ou null
   const [isActivitiesPopupOpen, setActivitiesPopupOpen] = useState(false);
   const [isAudioPopupOpen, setAudioPopupOpen] = useState(false);
   const [activitiesData, setActivitiesData] = useState([]);
   const [coachingStarted, setCoachingStarted] = useState(false);
-  const [xp, setXp] = useState(0);
 
   // Rapports simulés (ces données viendraient normalement de votre backend)
   const reportsStatus = {
@@ -27,19 +24,6 @@ export default function TasksPage() {
     weekly: { completed: 2, total: 24 },
     monthly: { completed: 0, total: 6 }
   };
-
-  // Fonction pour obtenir le suffixe ordinal en anglais (1st, 2nd, 3rd, etc.)
-  const getOrdinalSuffix = (num) => {
-    if (num % 100 >= 11 && num % 100 <= 13) {
-      return 'th';
-    }
-    switch (num % 10) {
-      case 1: return 'st';
-      case 2: return 'nd';
-      case 3: return 'rd';
-      default: return 'th';
-    }
-  }
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -54,53 +38,18 @@ export default function TasksPage() {
         const hasCoachingStarted = currentDate >= startDate;
         setCoachingStarted(hasCoachingStarted);
         
-        // Récupération des infos du profil
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)  // Correction: user_id au lieu de id
-          .single();
-  
-        if (profile) {
-          setUserProfile(profile);
-          
-          // Initialiser la progression
-          setProgress({
-            daysCompleted: profile.daysCompleted || 0,
-            totalDays: profile.totalDays || 180,
-          });
-          
-          setXp(profile.xp || 0);
-          
-          if (hasCoachingStarted) {
-            // Calculer le nombre de jours écoulés depuis le début du coaching
-            const diffTime = currentDate - startDate;
-            const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-            
-            // Ne pas dépasser le total de jours
-            const daysCompleted = Math.min(diffDays, profile.totalDays || 180);
-            
-            // Mettre à jour la progression si différente
-            if (daysCompleted !== profile.daysCompleted) {
-              setProgress({
-                daysCompleted,
-                totalDays: profile.totalDays || 180
-              });
-              
-              // Mettre à jour Supabase
-              await supabase
-                .from('profiles')
-                .update({ daysCompleted })
-                .eq('user_id', user.id);  // Correction: user_id au lieu de id
-            }
-          }
-          
-          // Calculer le nombre de semaines depuis le 7 avril 2025
+        if (hasCoachingStarted) {
+          // Calculer le nombre de jours écoulés depuis le début du coaching
           const diffTime = currentDate - startDate;
-          const diffWeeks = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 7)) + 1);
-          setWeekBadge(diffWeeks);
-        } else {
-          console.error("Erreur lors de la récupération du profil:", error);
+          const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+          
+          // Ne pas dépasser le total de jours
+          const daysCompleted = Math.min(diffDays, 180);
+          
+          setProgress({
+            daysCompleted,
+            totalDays: 180
+          });
         }
       }
     };
@@ -111,7 +60,7 @@ export default function TasksPage() {
   const progressPercentage = Math.floor((progress.daysCompleted / progress.totalDays) * 100);
   
   // Obtenir le nom complet ou utiliser une valeur par défaut
-  const fullName = userProfile?.full_name || user?.user_metadata?.display_name || user?.email || "Utilisateur";
+  const fullName = user?.user_metadata?.full_name || user?.email || "Utilisateur";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col justify-between relative p-4 pb-20">
@@ -134,12 +83,6 @@ export default function TasksPage() {
         </div>
         
         <div className="flex items-center">
-          {coachingStarted && (
-            <div className="mr-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-black px-3 py-1 rounded-lg font-bold shadow-lg">
-              <span className="text-lg mr-1">⚡</span>
-              <span>{xp || 0} XP</span>
-            </div>
-          )}
           <button onClick={() => setAudioPopupOpen(true)} className="bg-red-600 rounded-full p-2 shadow-lg hover:bg-red-700 transition mr-3">
             <span className="text-lg">🎙️</span>
           </button>
@@ -256,13 +199,6 @@ export default function TasksPage() {
           </>
         )}
       </section>
-
-      {/* Badge de semaine - Nouveau design comme dans Dashboard */}
-      <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-700 rounded-lg px-5 py-2 shadow-lg border border-indigo-400 z-20">
-        <p className="text-sm font-bold text-white">
-          {weekBadge}<sup>{getOrdinalSuffix(weekBadge)}</sup> Week
-        </p>
-      </div>
 
       {/* Pied de page : Menu de navigation */}
       <footer className="fixed bottom-0 left-0 right-0 flex justify-around items-center py-5 px-4 bg-gray-900 rounded-t-3xl shadow-lg">
