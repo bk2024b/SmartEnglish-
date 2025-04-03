@@ -8,7 +8,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell
 } from 'recharts';
 
-const AdminDashboard = () => {
+export default function AdminDashboard  () {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [dailyProgressData, setDailyProgressData] = useState([]);
