@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import ActivityFormPopup from '@/app/components/ActivityFormPopup';
 import React, { useState, useEffect } from 'react';
