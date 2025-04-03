@@ -1,432 +1,528 @@
-"use client";
 import React, { useState, useEffect } from 'react';
-// import { supabase } from "../../utils/supabaseClient";
-import Link from 'next/link';
-import ActivityFormPopup from "../../components/ActivityFormPopup.jsx";
+import { supabase } from '../supabaseClient';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  BarChart, Bar, PieChart, Pie, Cell
+} from 'recharts';
 
-export default function AdminDashboard() {
-  const [user, setUser] = useState(null);
-  const [learners, setLearners] = useState([]);
-  const [isActivityFormOpen, setActivityFormOpen] = useState(false);
-  const [weekNumber, setWeekNumber] = useState(1);
-  const [statistics, setStatistics] = useState({
-    totalLearners: 0,
-    activeToday: 0,
-    completionRate: 0,
-    audioSubmissions: 0
-  });
+const AdminDashboard = () => {
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [dailyProgressData, setDailyProgressData] = useState([]);
+  const [weeklyProgressData, setWeeklyProgressData] = useState([]);
+  const [monthlyProgressData, setMonthlyProgressData] = useState([]);
+  const [audioRecordings, setAudioRecordings] = useState([]);
+  const [timeRange, setTimeRange] = useState('week'); // 'week', 'month', '3months', 'all'
   const [loading, setLoading] = useState(true);
-  const [selectedFilter, setSelectedFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isActivityFormOpen, setActivityFormOpen] = useState(false);
+
+  // Couleurs pour les graphiques
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
   useEffect(() => {
-    const fetchAdminData = async () => {
-      setLoading(true);
-      // Commenté : Vérification de l'utilisateur connecté avec supabase
-      /*
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        // Vérifier le rôle admin dans la table profiles
-        //const { data: profile, error: profileError } = await supabase
-        // .from('profiles')
-        // .select('role')
-        // .eq('id', user.id)
-        // .single();
-        //if (profileError || profile.role !== 'admin') {
-        // console.error("Accès non autorisé");
-        // Rediriger vers la page d'accueil ou afficher une erreur
-        // return;
-        //}
-      */
-      // Pour le développement, on simule un utilisateur
-      setUser({ email: "admin@example.com" });
+    fetchUsers();
+  }, []);
 
-      // Calculer la semaine actuelle depuis le début du coaching (7 avril 2025)
-      const startDate = new Date('2025-04-07');
-      const currentDate = new Date();
-      const diffTime = currentDate - startDate;
-      const diffWeeks = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 7)) + 1);
-      setWeekNumber(diffWeeks);
+  useEffect(() => {
+    if (selectedUser) {
+      fetchData(selectedUser);
+    }
+  }, [selectedUser, timeRange]);
 
-      // Commenté : Récupération des données des apprenants depuis supabase
-      /*
-      const { data: learnersData, error: learnersError } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          email,
-          first_name,
-          last_name,
-          avatar,
-          daysCompleted,
-          totalDays,
-          weekBadge,
-          last_active,
-          audio_submissions(count)
-        `)
-        .eq('role', 'learner');
-
-      if (learnersError) {
-        console.error("Erreur lors de la récupération des apprenants:", learnersError);
-      } else {
-        setLearners(learnersData.map(learner => ({
-          ...learner,
-          progressPercentage: Math.floor((learner.daysCompleted / learner.totalDays) * 100),
-          audioSubmissionsCount: learner.audio_submissions.length
-        })));
-
-        // Calculer les statistiques
-        const today = new Date().setHours(0, 0, 0, 0);
-        const activeToday = learnersData.filter(learner => 
-          learner.last_active && new Date(learner.last_active).setHours(0, 0, 0, 0) === today
-        ).length;
+  const fetchUsers = async () => {
+    try {
+      // Utiliser la table auth.users de Supabase au lieu d'une table profiles personnalisée
+      const { data, error } = await supabase.auth.admin.listUsers();
+      
+      if (error) throw error;
+      
+      const formattedUsers = data?.users?.map(user => ({
+        id: user.id,
+        email: user.email
+      })) || [];
+      
+      setUsers(formattedUsers);
+      if (formattedUsers.length > 0) setSelectedUser(formattedUsers[0].id);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des utilisateurs:', error);
+      
+      // Fallback en cas d'erreur d'autorisation pour l'admin.listUsers
+      try {
+        const { data: authData, error: authError } = await supabase
+          .from('auth.users')
+          .select('id, email');
         
-        const totalAudioSubmissions = learnersData.reduce((sum, learner) => 
-          sum + learner.audio_submissions.length, 0
-        );
-        
-        const avgCompletionRate = learnersData.reduce((sum, learner) => 
-          sum + (learner.daysCompleted / learner.totalDays), 0
-        ) / learnersData.length * 100;
-        
-        setStatistics({
-          totalLearners: learnersData.length,
-          activeToday,
-          completionRate: Math.floor(avgCompletionRate),
-          audioSubmissions: totalAudioSubmissions
+        if (authError) throw authError;
+        setUsers(authData);
+        if (authData.length > 0) setSelectedUser(authData[0].id);
+      } catch (fallbackError) {
+        console.error('Erreur lors de la récupération fallback des utilisateurs:', fallbackError);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchData = async (userId) => {
+    setLoading(true);
+    
+    try {
+      // Déterminer les dates de début en fonction du timeRange
+      const now = new Date();
+      let startDate = new Date();
+      
+      switch(timeRange) {
+        case 'week':
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        case '3months':
+          startDate.setMonth(now.getMonth() - 3);
+          break;
+        case 'all':
+          startDate.setMonth(now.getMonth() - 6);
+          break;
+        default:
+          startDate.setDate(now.getDate() - 7);
+      }
+      
+      const formattedStartDate = startDate.toISOString().split('T')[0];
+      
+      // Récupérer les données quotidiennes
+      const { data: dailyData, error: dailyError } = await supabase
+        .from('daily_progress')
+        .select('*')
+        .eq('profile_id', userId)
+        .gte('date', formattedStartDate)
+        .order('date', { ascending: true });
+      
+      if (dailyError) throw dailyError;
+      setDailyProgressData(dailyData);
+      
+      // Récupérer les données hebdomadaires
+      const { data: weeklyData, error: weeklyError } = await supabase
+        .from('weekly_progress')
+        .select('*')
+        .eq('profile_id', userId)
+        .gte('week_start_date', formattedStartDate)
+        .order('week_start_date', { ascending: true });
+      
+      if (weeklyError) throw weeklyError;
+      setWeeklyProgressData(weeklyData);
+      
+      // Récupérer les données mensuelles
+      const { data: monthlyData, error: monthlyError } = await supabase
+        .from('monthly_progress')
+        .select('*')
+        .eq('profile_id', userId)
+        .order('month', { ascending: true });
+      
+      if (monthlyError) throw monthlyError;
+      setMonthlyProgressData(monthlyData);
+      
+      // Récupérer les enregistrements audio
+      const { data: audioData, error: audioError } = await supabase
+        .from('audio_notes')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (audioError) throw audioError;
+      setAudioRecordings(audioData);
+      
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fonction pour convertir les temps en minutes
+  const convertTimeToMinutes = (timeString) => {
+    if (!timeString) return 0;
+    
+    const regex = /(\d+)h\s*(\d+)min/;
+    const match = timeString.match(regex);
+    
+    if (match) {
+      const hours = parseInt(match[1]);
+      const minutes = parseInt(match[2]);
+      return hours * 60 + minutes;
+    }
+    
+    return 0;
+  };
+
+  // Préparation des données pour les graphiques
+  const prepareTimeSpentData = () => {
+    return dailyProgressData.map(day => ({
+      date: day.date,
+      timeSpent: convertTimeToMinutes(day.time_spent)
+    }));
+  };
+
+  const prepareConfidenceData = () => {
+    return dailyProgressData.map(day => ({
+      date: day.date,
+      confidence: day.confidence_score
+    }));
+  };
+
+  const prepareActivitiesData = () => {
+    const activities = {};
+    
+    dailyProgressData.forEach(day => {
+      if (day.activities_done && typeof day.activities_done === 'object') {
+        Object.entries(day.activities_done).forEach(([activity, value]) => {
+          if (value === true) {
+            activities[activity] = (activities[activity] || 0) + 1;
+          }
         });
       }
-      */
-
-      // Pour le développement, on utilise des données fictives
-      const mockLearners = [
-        {
-          id: 1,
-          email: "learner1@example.com",
-          first_name: "Jean",
-          last_name: "Dupont",
-          avatar: "/avatars/stage1.jpg",
-          daysCompleted: 15,
-          totalDays: 30,
-          weekBadge: 2,
-          last_active: new Date().toISOString(),
-          audio_submissions: [1, 2, 3],
-          progressPercentage: 50,
-          audioSubmissionsCount: 3
-        },
-        {
-          id: 2,
-          email: "learner2@example.com",
-          first_name: "Marie",
-          last_name: "Laurent",
-          avatar: "/avatars/stage2.jpg",
-          daysCompleted: 25,
-          totalDays: 30,
-          weekBadge: 3,
-          last_active: new Date().toISOString(),
-          audio_submissions: [1, 2, 3, 4],
-          progressPercentage: 83,
-          audioSubmissionsCount: 4
-        },
-        {
-          id: 3,
-          email: "learner3@example.com",
-          first_name: "Pierre",
-          last_name: "Martin",
-          avatar: "/avatars/stage1.jpg",
-          daysCompleted: 10,
-          totalDays: 30,
-          weekBadge: 1,
-          last_active: new Date(new Date().setDate(new Date().getDate() - 3)).toISOString(),
-          audio_submissions: [1],
-          progressPercentage: 33,
-          audioSubmissionsCount: 1
-        }
-      ];
-      
-      setLearners(mockLearners);
-      setStatistics({
-        totalLearners: mockLearners.length,
-        activeToday: mockLearners.filter(l => new Date(l.last_active).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0)).length,
-        completionRate: Math.floor(mockLearners.reduce((sum, l) => sum + l.progressPercentage, 0) / mockLearners.length),
-        audioSubmissions: mockLearners.reduce((sum, l) => sum + l.audioSubmissionsCount, 0)
-      });
-      
-      setLoading(false);
-    };
-    
-    fetchAdminData();
-  }, []);
-  
-  // Filtrer les apprenants en fonction du filtre sélectionné et de la recherche
-  const filteredLearners = learners
-    .filter(learner => {
-      // Filtre par état
-      if (selectedFilter === 'active') {
-        const today = new Date().setHours(0, 0, 0, 0);
-        return learner.last_active && new Date(learner.last_active).setHours(0, 0, 0, 0) === today;
-      } else if (selectedFilter === 'at-risk') {
-        // Considérer "à risque" si moins de 50% de progression à ce stade
-        return learner.progressPercentage < 50;
-      } else if (selectedFilter === 'excellent') {
-        // Considérer "excellent" si plus de 80% de progression
-        return learner.progressPercentage > 80;
-      }
-      return true; // 'all'
-    })
-    .filter(learner => {
-      // Recherche par nom ou email
-      if (!searchQuery) return true;
-      const fullName = `${learner.first_name || ''} ${learner.last_name || ''}`.toLowerCase();
-      const email = (learner.email || '').toLowerCase();
-      return fullName.includes(searchQuery.toLowerCase()) || email.includes(searchQuery.toLowerCase());
     });
+    
+    return Object.entries(activities).map(([name, count]) => ({
+      name,
+      count
+    }));
+  };
+  
+  const prepareDifficultiesData = () => {
+    const difficulties = {};
+    
+    dailyProgressData.forEach(day => {
+      if (day.difficulties && typeof day.difficulties === 'object') {
+        Object.entries(day.difficulties).forEach(([difficulty, value]) => {
+          if (value === true) {
+            difficulties[difficulty] = (difficulties[difficulty] || 0) + 1;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(difficulties).map(([name, count]) => ({
+      name,
+      count
+    }));
+  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-gray-700">Chargement du tableau de bord administrateur...</div>
-      </div>
-    );
-  }
+  const prepareNewExpressionsData = () => {
+    return dailyProgressData.map(day => ({
+      date: day.date,
+      count: parseInt(day.new_expressions_count || 0)
+    }));
+  };
+
+  // Calcul des statistiques globales
+  const calculateStats = () => {
+    if (!dailyProgressData.length) return { totalTimeSpent: 0, avgConfidence: 0, totalActivities: 0, totalExpressions: 0 };
+    
+    const totalTimeSpent = dailyProgressData.reduce((sum, day) => sum + convertTimeToMinutes(day.time_spent), 0);
+    const avgConfidence = dailyProgressData.reduce((sum, day) => sum + (day.confidence_score || 0), 0) / dailyProgressData.length;
+    
+    const activitiesCount = dailyProgressData.reduce((sum, day) => {
+      if (day.activities_done && typeof day.activities_done === 'object') {
+        return sum + Object.values(day.activities_done).filter(v => v === true).length;
+      }
+      return sum;
+    }, 0);
+    
+    const totalExpressions = dailyProgressData.reduce((sum, day) => sum + parseInt(day.new_expressions_count || 0), 0);
+    
+    return {
+      totalTimeSpent,
+      avgConfidence,
+      activitiesCount,
+      totalExpressions
+    };
+  };
 
   return (
-    <main className="min-h-screen bg-gray-100">
-      {/* En-tête */}
-      <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
-        <div className="container mx-auto py-4 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold">Dashboard Admin</h1>
-            <p className="text-xs sm:text-sm opacity-90">Coaching d'anglais - Semaine {weekNumber}</p>
-          </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-            <span className="text-sm sm:mr-4 truncate max-w-xs">{user?.email}</span>
-            <Link href="/auth/signout" className="bg-white text-blue-600 px-3 py-1 sm:px-4 sm:py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap">
-              Déconnexion
-            </Link>
-          </div>
+    <div className="p-6 max-w-6xl mx-auto bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6">Dashboard de Suivi des Apprenants</h1>
+      
+      {/* Sélecteur d'utilisateur et de période */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        <div className="w-64">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sélectionner un apprenant</label>
+          <select 
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={selectedUser || ''}
+            onChange={(e) => setSelectedUser(e.target.value)}
+            disabled={loading}
+          >
+            {users.map(user => (
+              <option key={user.id} value={user.id}>{user.email}</option>
+            ))}
+          </select>
         </div>
-      </header>
-
-      {/* Section des statistiques */}
-      <section className="container mx-auto py-4 sm:py-6 px-4 sm:px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Apprenants inscrits</h3>
-            <div className="flex items-center">
-              <span className="text-xl sm:text-3xl font-bold text-gray-800">{statistics.totalLearners}</span>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Actifs aujourd'hui</h3>
-            <div className="flex items-center">
-              <span className="text-xl sm:text-3xl font-bold text-green-600">{statistics.activeToday}</span>
-              <span className="text-xs sm:text-sm text-gray-500 ml-2">
-                ({Math.round((statistics.activeToday / statistics.totalLearners) * 100)}%)
-              </span>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Taux de complétion moyen</h3>
-            <div className="flex items-center">
-              <span className="text-xl sm:text-3xl font-bold text-blue-600">{statistics.completionRate}%</span>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-gray-500 text-xs sm:text-sm font-medium">Enregistrements audio soumis</h3>
-            <div className="flex items-center">
-              <span className="text-xl sm:text-3xl font-bold text-purple-600">{statistics.audioSubmissions}</span>
-            </div>
-          </div>
+        
+        <div className="w-64">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Période</label>
+          <select 
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
+            disabled={loading}
+          >
+            <option value="week">7 derniers jours</option>
+            <option value="month">30 derniers jours</option>
+            <option value="3months">3 derniers mois</option>
+            <option value="all">Programme entier (6 mois)</option>
+          </select>
         </div>
-      </section>
-
-      {/* Section d'action */}
-      <section className="container mx-auto py-2 px-4 sm:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 gap-3">
-          <div className="mb-2 md:mb-0">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800">Gestion des apprenants</h2>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-            <button
-              onClick={() => setActivityFormOpen(true)}
-              className="bg-blue-600 text-white px-3 py-2 sm:px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center sm:justify-start text-sm"
-            >
-              <span className="mr-2">+</span>
-              Définir les activités du jour
-            </button>
-            <Link href="/admin/reports" className="bg-gray-200 text-gray-700 px-3 py-2 sm:px-4 rounded-md hover:bg-gray-300 transition-colors text-center sm:text-left text-sm">
-              Rapports d'activité
-            </Link>
-          </div>
+        
+        <div className="flex items-end">
+          <button 
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            onClick={() => setOpenActivityForm(true)}
+          >
+            Ajouter une activité
+          </button>
         </div>
-      </section>
-
-      {/* Section filtres et recherche */}
-      <section className="container mx-auto py-2 px-4 sm:px-6">
-        <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">
-          <div className="flex flex-col md:flex-row justify-between space-y-3 md:space-y-0 md:space-x-3">
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedFilter('all')}
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'all' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Tous
-              </button>
-              <button
-                onClick={() => setSelectedFilter('active')}
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Actifs aujourd'hui
-              </button>
-              <button
-                onClick={() => setSelectedFilter('at-risk')}
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'at-risk' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                À risque
-              </button>
-              <button
-                onClick={() => setSelectedFilter('excellent')}
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm ${selectedFilter === 'excellent' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-              >
-                Excellents
-              </button>
+      </div>
+      
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-xl">Chargement des données...</div>
+        </div>
+      ) : (
+        <>
+          {/* Statistiques principales */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {(() => {
+              const stats = calculateStats();
+              return (
+                <>
+                  <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-lg font-semibold text-gray-700">Temps Total</h3>
+                    <p className="text-2xl font-bold">{Math.floor(stats.totalTimeSpent / 60)}h {stats.totalTimeSpent % 60}min</p>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-lg font-semibold text-gray-700">Confiance Moyenne</h3>
+                    <p className="text-2xl font-bold">{stats.avgConfidence.toFixed(1)}/10</p>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-lg font-semibold text-gray-700">Activités Complétées</h3>
+                    <p className="text-2xl font-bold">{stats.activitiesCount}</p>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="text-lg font-semibold text-gray-700">Nouvelles Expressions</h3>
+                    <p className="text-2xl font-bold">{stats.totalExpressions}</p>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+          
+          {/* Graphiques */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Temps passé par jour */}
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Temps d'étude quotidien (en minutes)</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={prepareTimeSpentData()}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="timeSpent" stroke="#8884d8" name="Temps (min)" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-            <div className="relative w-full md:w-64">
-              <input
-                type="text"
-                placeholder="Rechercher un apprenant..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
+            
+            {/* Niveau de confiance */}
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Évolution du niveau de confiance</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={prepareConfidenceData()}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis domain={[0, 10]} />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="confidence" stroke="#82ca9d" name="Confiance (/10)" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* Activités réalisées */}
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Activités les plus pratiquées</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={prepareActivitiesData().sort((a, b) => b.count - a.count).slice(0, 5)}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="count" fill="#8884d8" name="Fréquence" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* Difficultés rencontrées */}
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Difficultés rencontrées</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={prepareDifficultiesData()}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="count"
+                      nameKey="name"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {prepareDifficultiesData().map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Liste des apprenants */}
-      <section className="container mx-auto py-2 px-4 sm:px-6 mb-8">
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Apprenant
-                  </th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Progression
-                  </th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                    Niveau
-                  </th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                    Dernière activité
-                  </th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                    Audio
-                  </th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredLearners.length === 0 ? (
-                  <tr>
-                    <td colSpan="6" className="px-3 sm:px-6 py-4 text-center text-gray-500">
-                      {searchQuery ? 'Aucun apprenant ne correspond à votre recherche' : 'Aucun apprenant dans cette catégorie'}
-                    </td>
+          
+          {/* Progression sur 6 mois */}
+          <div className="bg-white p-4 rounded-lg shadow mb-6">
+            <h3 className="text-lg font-semibold mb-4">Progression sur le programme de 6 mois</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyProgressData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis domain={[0, 10]} />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="confidence_score" stroke="#ff7300" name="Confiance" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          
+          {/* Enregistrements vocaux */}
+          <div className="bg-white p-4 rounded-lg shadow mb-6">
+            <h3 className="text-lg font-semibold mb-4">Enregistrements vocaux récents</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="p-2 text-left">Titre</th>
+                    <th className="p-2 text-left">Date</th>
+                    <th className="p-2 text-left">Actions</th>
                   </tr>
-                ) : (
-                  filteredLearners.map((learner) => {
-                    // Calculer le niveau en fonction du nombre de mois écoulés
-                    const startDate = new Date('2025-04-07');
-                    const currentDate = new Date();
-                    const diffTime = currentDate - startDate;
-                    const diffMonths = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 30)) + 1);
-                    const level = Math.min(diffMonths, 6);
-                    
-                    // Déterminer la couleur de la progression
-                    let progressColor;
-                    if (learner.progressPercentage < 40) progressColor = 'bg-red-500';
-                    else if (learner.progressPercentage < 70) progressColor = 'bg-yellow-500';
-                    else progressColor = 'bg-green-500';
-                    
-                    // Formater la date de dernière activité
-                    const lastActive = learner.last_active ? new Date(learner.last_active) : null;
-                    const today = new Date();
-                    const isToday = lastActive && lastActive.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0);
-                    const lastActiveFormatted = isToday
-                      ? `Aujourd'hui ${lastActive.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
-                      : lastActive ? lastActive.toLocaleDateString('fr-FR') : 'Jamais';
-                    
-                    return (
-                      <tr key={learner.id}>
-                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
-                              <img
-                                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover"
-                                src={learner.avatar || "/avatars/stage1.jpg"}
-                                alt="Avatar de l'apprenant"
-                              />
-                            </div>
-                            <div className="ml-2 sm:ml-4">
-                              <div className="text-xs sm:text-sm font-medium text-gray-900 line-clamp-1">
-                                {`${learner.first_name || ''} ${learner.last_name || ''}` || 'Apprenant sans nom'}
-                              </div>
-                              <div className="text-xs sm:text-sm text-gray-500 line-clamp-1">{learner.email}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="w-16 sm:w-24 bg-gray-200 rounded-full h-2 mr-2">
-                              <div className={`h-2 rounded-full ${progressColor}`} style={{ width: `${learner.progressPercentage}%` }}></div>
-                            </div>
-                            <span className="text-xs sm:text-sm text-gray-500">{learner.progressPercentage}%</span>
-                          </div>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            Niveau {level}
-                          </span>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                          <span className={`text-xs sm:text-sm ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
-                            {lastActiveFormatted}
-                          </span>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
-                          {learner.audioSubmissionsCount || 0} soumissions
-                        </td>
-                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
-                          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                            <Link href={`/admin/learner/${learner.id}`} className="text-blue-600 hover:text-blue-900">
-                              Détails
-                            </Link>
-                            <button className="text-gray-600 hover:text-gray-900">Message</button>
-                          </div>
+                </thead>
+                <tbody>
+                  {audioRecordings.length === 0 ? (
+                    <tr>
+                      <td colSpan="3" className="p-2 text-center">Aucun enregistrement disponible</td>
+                    </tr>
+                  ) : (
+                    audioRecordings.map(recording => (
+                      <tr key={recording.id} className="border-t">
+                        <td className="p-2">{recording.title}</td>
+                        <td className="p-2">{new Date(recording.created_at).toLocaleDateString()}</td>
+                        <td className="p-2">
+                          <a 
+                            href={recording.file_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            Écouter
+                          </a>
                         </td>
                       </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Popup pour l'ajout d'activités */}
+          
+          {/* Résumé des stratégies et défis */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Stratégies utilisées</h3>
+              <ul className="space-y-2">
+                {dailyProgressData.slice(-5).map((day, index) => (
+                  <li key={index} className="p-2 bg-gray-50 rounded">
+                    <span className="font-medium">{day.date}</span>: {day.overcoming_strategies || "Aucune stratégie notée"}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Défis hebdomadaires</h3>
+              <ul className="space-y-2">
+                {weeklyProgressData.slice(-5).map((week, index) => (
+                  <li key={index} className="p-2 bg-gray-50 rounded">
+                    <span className="font-medium">{week.week_start_date} - {week.week_end_date}</span>: {week.biggest_challenge || "Aucun défi noté"}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          
+          {/* Nouvelles compétences acquises */}
+          <div className="bg-white p-4 rounded-lg shadow mb-6">
+            <h3 className="text-lg font-semibold mb-4">Nouvelles compétences acquises</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="p-2 text-left">Mois</th>
+                    <th className="p-2 text-left">Compétence 1</th>
+                    <th className="p-2 text-left">Compétence 2</th>
+                    <th className="p-2 text-left">Compétence 3</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyProgressData.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="p-2 text-center">Aucune compétence enregistrée</td>
+                    </tr>
+                  ) : (
+                    monthlyProgressData.map(month => (
+                      <tr key={month.id || month.month} className="border-t">
+                        <td className="p-2">{month.month}</td>
+                        <td className="p-2">{month.newSkill1 || "-"}</td>
+                        <td className="p-2">{month.newSkill2 || "-"}</td>
+                        <td className="p-2">{month.newSkill3 || "-"}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+      
+      {/* Formulaire d'ajout d'activité (utilise la popup existante) */}
       <ActivityFormPopup
         isOpen={isActivityFormOpen}
         onClose={() => setActivityFormOpen(false)}
       />
-    </main>
+    </div>
   );
-}
+};
