@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [activitiesData, setActivitiesData] = useState([]);
   const [progress, setProgress] = useState({ daysCompleted: 0, totalDays: 180 });
   const [coachingStarted, setCoachingStarted] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const avatars = [
     "/avatars/stage1.jpg",
@@ -34,6 +35,9 @@ export default function Dashboard() {
       
       if (user) {
         setUser(user);
+        
+        // Vérifier si l'utilisateur est l'administrateur
+        setIsAdmin(user.email === "senamijonas@gmail.com");
         
         // Étape 2: Vérifier si le coaching a commencé
         const startDate = new Date('2025-04-07');
@@ -158,6 +162,11 @@ export default function Dashboard() {
         </div>
         
         <div className="flex items-center">
+          {isAdmin && (
+            <Link href="/dashboard/admin" className="bg-purple-700 rounded-full p-2 shadow-lg hover:bg-purple-600 transition mr-3">
+              <span className="text-lg">👑</span>
+            </Link>
+          )}
           <button onClick={() => setAudioPopupOpen(true)} className="bg-red-600 rounded-full p-2 shadow-lg hover:bg-red-700 transition mr-3">
             <span className="text-lg">🎙️</span>
           </button>
