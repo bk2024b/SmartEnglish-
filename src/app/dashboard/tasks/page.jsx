@@ -60,7 +60,7 @@ export default function TasksPage() {
   const progressPercentage = Math.floor((progress.daysCompleted / progress.totalDays) * 100);
   
   // Obtenir le nom complet ou utiliser une valeur par défaut
-  const fullName = user?.user_metadata?.full_name || user?.email || "Utilisateur";
+  const fullName = user?.user_metadata?.display_name || user?.email || "Utilisateur";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col justify-between relative p-4 pb-20">
