@@ -1,3 +1,6 @@
+'use client'
+
+import ActivityFormPopup from '@/app/components/ActivityFormPopup';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import {
