@@ -34,33 +34,21 @@ export default function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      // Utiliser la table auth.users de Supabase au lieu d'une table profiles personnalisée
-      const { data, error } = await supabase.auth.admin.listUsers();
+      // Utiliser la table profiles que nous venons de créer
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email');
       
-      if (error) throw error;
+      if (profilesError) throw profilesError;
       
-      const formattedUsers = data?.users?.map(user => ({
-        id: user.id,
-        email: user.email
-      })) || [];
-      
+      const formattedUsers = profilesData || [];
       setUsers(formattedUsers);
-      if (formattedUsers.length > 0) setSelectedUser(formattedUsers[0].id);
+      
+      if (formattedUsers.length > 0) {
+        setSelectedUser(formattedUsers[0].id);
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
-      
-      // Fallback en cas d'erreur d'autorisation pour l'admin.listUsers
-      try {
-        const { data: authData, error: authError } = await supabase
-          .from('users')
-          .select('id, email');
-        
-        if (authError) throw authError;
-        setUsers(authData || []);
-        if (authData?.length > 0) setSelectedUser(authData[0].id);
-      } catch (fallbackError) {
-        console.error('Erreur lors de la récupération fallback des utilisateurs:', fallbackError);
-      }
     } finally {
       setLoading(false);
     }
