@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import ActivityFormPopup from '@/app/components/ActivityFormPopup';
 import React, { useState, useEffect } from 'react';
@@ -8,7 +8,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell
 } from 'recharts';
 
-export default function AdminDashboard  () {
+export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [dailyProgressData, setDailyProgressData] = useState([]);
@@ -19,8 +19,8 @@ export default function AdminDashboard  () {
   const [loading, setLoading] = useState(true);
   const [isActivityFormOpen, setActivityFormOpen] = useState(false);
 
-  // Couleurs pour les graphiques
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+  // Couleurs pour les graphiques - plus vives pour meilleur contraste
+  const COLORS = ['#0066FF', '#00B050', '#FF9900', '#FF3333', '#8834FF', '#00CCCC'];
 
   useEffect(() => {
     fetchUsers();
@@ -51,9 +51,8 @@ export default function AdminDashboard  () {
       
       // Fallback en cas d'erreur d'autorisation pour l'admin.listUsers
       try {
-        // Note: No "auth." prefix in the table name when using from()
         const { data: authData, error: authError } = await supabase
-          .from('users')  // Or whatever your actual table name is
+          .from('users')
           .select('id, email');
         
         if (authError) throw authError;
@@ -244,15 +243,15 @@ export default function AdminDashboard  () {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-gray-50">
-      <h1 className="text-3xl font-bold mb-6">Dashboard de Suivi des Apprenants</h1>
+    <div className="p-6 max-w-6xl mx-auto bg-white">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">Dashboard de Suivi des Apprenants</h1>
       
       {/* Sélecteur d'utilisateur et de période */}
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="w-64">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Sélectionner un apprenant</label>
+          <label className="block text-base font-medium text-gray-800 mb-1">Sélectionner un apprenant</label>
           <select 
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-2 border border-gray-400 rounded-md text-gray-800 bg-white"
             value={selectedUser || ''}
             onChange={(e) => setSelectedUser(e.target.value)}
             disabled={loading}
@@ -264,9 +263,9 @@ export default function AdminDashboard  () {
         </div>
         
         <div className="w-64">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Période</label>
+          <label className="block text-base font-medium text-gray-800 mb-1">Période</label>
           <select 
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-2 border border-gray-400 rounded-md text-gray-800 bg-white"
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
             disabled={loading}
@@ -280,7 +279,7 @@ export default function AdminDashboard  () {
         
         <div className="flex items-end">
           <button 
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 font-medium"
             onClick={() => setActivityFormOpen(true)}
           >
             Ajouter une activité
@@ -290,7 +289,7 @@ export default function AdminDashboard  () {
       
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="text-xl">Chargement des données...</div>
+          <div className="text-xl text-gray-800">Chargement des données...</div>
         </div>
       ) : (
         <>
@@ -300,24 +299,24 @@ export default function AdminDashboard  () {
               const stats = calculateStats();
               return (
                 <>
-                  <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-700">Temps Total</h3>
-                    <p className="text-2xl font-bold">{Math.floor(stats.totalTimeSpent / 60)}h {stats.totalTimeSpent % 60}min</p>
+                  <div className="bg-blue-50 p-4 rounded-lg shadow border border-blue-100">
+                    <h3 className="text-lg font-semibold text-gray-800">Temps Total</h3>
+                    <p className="text-2xl font-bold text-blue-700">{Math.floor(stats.totalTimeSpent / 60)}h {stats.totalTimeSpent % 60}min</p>
                   </div>
                   
-                  <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-700">Confiance Moyenne</h3>
-                    <p className="text-2xl font-bold">{stats.avgConfidence.toFixed(1)}/10</p>
+                  <div className="bg-green-50 p-4 rounded-lg shadow border border-green-100">
+                    <h3 className="text-lg font-semibold text-gray-800">Confiance Moyenne</h3>
+                    <p className="text-2xl font-bold text-green-700">{stats.avgConfidence.toFixed(1)}/10</p>
                   </div>
                   
-                  <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-700">Activités Complétées</h3>
-                    <p className="text-2xl font-bold">{stats.activitiesCount}</p>
+                  <div className="bg-amber-50 p-4 rounded-lg shadow border border-amber-100">
+                    <h3 className="text-lg font-semibold text-gray-800">Activités Complétées</h3>
+                    <p className="text-2xl font-bold text-amber-700">{stats.activitiesCount}</p>
                   </div>
                   
-                  <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-700">Nouvelles Expressions</h3>
-                    <p className="text-2xl font-bold">{stats.totalExpressions}</p>
+                  <div className="bg-purple-50 p-4 rounded-lg shadow border border-purple-100">
+                    <h3 className="text-lg font-semibold text-gray-800">Nouvelles Expressions</h3>
+                    <p className="text-2xl font-bold text-purple-700">{stats.totalExpressions}</p>
                   </div>
                 </>
               );
@@ -327,59 +326,59 @@ export default function AdminDashboard  () {
           {/* Graphiques */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Temps passé par jour */}
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Temps d'étude quotidien (en minutes)</h3>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Temps d'étude quotidien (en minutes)</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={prepareTimeSpentData()}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="timeSpent" stroke="#8884d8" name="Temps (min)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                    <XAxis dataKey="date" tick={{fill: '#333'}} />
+                    <YAxis tick={{fill: '#333'}} />
+                    <Tooltip contentStyle={{backgroundColor: 'white', border: '1px solid #ccc'}} />
+                    <Legend wrapperStyle={{color: '#333'}} />
+                    <Line type="monotone" dataKey="timeSpent" stroke="#0066FF" strokeWidth={2} name="Temps (min)" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
             
             {/* Niveau de confiance */}
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Évolution du niveau de confiance</h3>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Évolution du niveau de confiance</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={prepareConfidenceData()}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis domain={[0, 10]} />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="confidence" stroke="#82ca9d" name="Confiance (/10)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                    <XAxis dataKey="date" tick={{fill: '#333'}} />
+                    <YAxis domain={[0, 10]} tick={{fill: '#333'}} />
+                    <Tooltip contentStyle={{backgroundColor: 'white', border: '1px solid #ccc'}} />
+                    <Legend wrapperStyle={{color: '#333'}} />
+                    <Line type="monotone" dataKey="confidence" stroke="#00B050" strokeWidth={2} name="Confiance (/10)" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
             
             {/* Activités réalisées */}
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Activités les plus pratiquées</h3>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Activités les plus pratiquées</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={prepareActivitiesData().sort((a, b) => b.count - a.count).slice(0, 5)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" fill="#8884d8" name="Fréquence" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                    <XAxis dataKey="name" tick={{fill: '#333'}} />
+                    <YAxis tick={{fill: '#333'}} />
+                    <Tooltip contentStyle={{backgroundColor: 'white', border: '1px solid #ccc'}} />
+                    <Legend wrapperStyle={{color: '#333'}} />
+                    <Bar dataKey="count" fill="#FF9900" name="Fréquence" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
             
             {/* Difficultés rencontrées */}
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Difficultés rencontrées</h3>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Difficultés rencontrées</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -387,7 +386,7 @@ export default function AdminDashboard  () {
                       data={prepareDifficultiesData()}
                       cx="50%"
                       cy="50%"
-                      labelLine={false}
+                      labelLine={true}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="count"
@@ -398,7 +397,7 @@ export default function AdminDashboard  () {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip contentStyle={{backgroundColor: 'white', border: '1px solid #ccc'}} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -406,50 +405,50 @@ export default function AdminDashboard  () {
           </div>
           
           {/* Progression sur 6 mois */}
-          <div className="bg-white p-4 rounded-lg shadow mb-6">
-            <h3 className="text-lg font-semibold mb-4">Progression sur le programme de 6 mois</h3>
+          <div className="bg-white p-4 rounded-lg shadow border border-gray-200 mb-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Progression sur le programme de 6 mois</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyProgressData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis domain={[0, 10]} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="confidence_score" stroke="#ff7300" name="Confiance" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                  <XAxis dataKey="month" tick={{fill: '#333'}} />
+                  <YAxis domain={[0, 10]} tick={{fill: '#333'}} />
+                  <Tooltip contentStyle={{backgroundColor: 'white', border: '1px solid #ccc'}} />
+                  <Legend wrapperStyle={{color: '#333'}} />
+                  <Line type="monotone" dataKey="confidence_score" stroke="#FF3333" strokeWidth={2} name="Confiance" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
           
           {/* Enregistrements vocaux */}
-          <div className="bg-white p-4 rounded-lg shadow mb-6">
-            <h3 className="text-lg font-semibold mb-4">Enregistrements vocaux récents</h3>
+          <div className="bg-white p-4 rounded-lg shadow border border-gray-200 mb-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Enregistrements vocaux récents</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="p-2 text-left">Titre</th>
-                    <th className="p-2 text-left">Date</th>
-                    <th className="p-2 text-left">Actions</th>
+                    <th className="p-3 text-left font-semibold text-gray-800 border-b-2 border-gray-300">Titre</th>
+                    <th className="p-3 text-left font-semibold text-gray-800 border-b-2 border-gray-300">Date</th>
+                    <th className="p-3 text-left font-semibold text-gray-800 border-b-2 border-gray-300">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {audioRecordings.length === 0 ? (
                     <tr>
-                      <td colSpan="3" className="p-2 text-center">Aucun enregistrement disponible</td>
+                      <td colSpan="3" className="p-3 text-center text-gray-700">Aucun enregistrement disponible</td>
                     </tr>
                   ) : (
                     audioRecordings.map(recording => (
-                      <tr key={recording.id} className="border-t">
-                        <td className="p-2">{recording.title}</td>
-                        <td className="p-2">{new Date(recording.created_at).toLocaleDateString()}</td>
-                        <td className="p-2">
+                      <tr key={recording.id} className="border-t hover:bg-gray-50">
+                        <td className="p-3 text-gray-700">{recording.title}</td>
+                        <td className="p-3 text-gray-700">{new Date(recording.created_at).toLocaleDateString()}</td>
+                        <td className="p-3">
                           <a 
                             href={recording.file_url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
+                            className="text-blue-700 hover:underline font-medium"
                           >
                             Écouter
                           </a>
@@ -464,23 +463,25 @@ export default function AdminDashboard  () {
           
           {/* Résumé des stratégies et défis */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Stratégies utilisées</h3>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Stratégies utilisées</h3>
               <ul className="space-y-2">
                 {dailyProgressData.slice(-5).map((day, index) => (
-                  <li key={index} className="p-2 bg-gray-50 rounded">
-                    <span className="font-medium">{day.date}</span>: {day.overcoming_strategies || "Aucune stratégie notée"}
+                  <li key={index} className="p-3 bg-blue-50 rounded border border-blue-100">
+                    <span className="font-medium text-blue-800">{day.date}</span>: 
+                    <span className="text-gray-800 ml-2">{day.overcoming_strategies || "Aucune stratégie notée"}</span>
                   </li>
                 ))}
               </ul>
             </div>
             
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Défis hebdomadaires</h3>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Défis hebdomadaires</h3>
               <ul className="space-y-2">
                 {weeklyProgressData.slice(-5).map((week, index) => (
-                  <li key={index} className="p-2 bg-gray-50 rounded">
-                    <span className="font-medium">{week.week_start_date} - {week.week_end_date}</span>: {week.biggest_challenge || "Aucun défi noté"}
+                  <li key={index} className="p-3 bg-purple-50 rounded border border-purple-100">
+                    <span className="font-medium text-purple-800">{week.week_start_date} - {week.week_end_date}</span>: 
+                    <span className="text-gray-800 ml-2">{week.biggest_challenge || "Aucun défi noté"}</span>
                   </li>
                 ))}
               </ul>
@@ -488,30 +489,30 @@ export default function AdminDashboard  () {
           </div>
           
           {/* Nouvelles compétences acquises */}
-          <div className="bg-white p-4 rounded-lg shadow mb-6">
-            <h3 className="text-lg font-semibold mb-4">Nouvelles compétences acquises</h3>
+          <div className="bg-white p-4 rounded-lg shadow border border-gray-200 mb-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Nouvelles compétences acquises</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="p-2 text-left">Mois</th>
-                    <th className="p-2 text-left">Compétence 1</th>
-                    <th className="p-2 text-left">Compétence 2</th>
-                    <th className="p-2 text-left">Compétence 3</th>
+                    <th className="p-3 text-left font-semibold text-gray-800 border-b-2 border-gray-300">Mois</th>
+                    <th className="p-3 text-left font-semibold text-gray-800 border-b-2 border-gray-300">Compétence 1</th>
+                    <th className="p-3 text-left font-semibold text-gray-800 border-b-2 border-gray-300">Compétence 2</th>
+                    <th className="p-3 text-left font-semibold text-gray-800 border-b-2 border-gray-300">Compétence 3</th>
                   </tr>
                 </thead>
                 <tbody>
                   {monthlyProgressData.length === 0 ? (
                     <tr>
-                      <td colSpan="4" className="p-2 text-center">Aucune compétence enregistrée</td>
+                      <td colSpan="4" className="p-3 text-center text-gray-700">Aucune compétence enregistrée</td>
                     </tr>
                   ) : (
                     monthlyProgressData.map(month => (
-                      <tr key={month.id || month.month} className="border-t">
-                        <td className="p-2">{month.month}</td>
-                        <td className="p-2">{month.newSkill1 || "-"}</td>
-                        <td className="p-2">{month.newSkill2 || "-"}</td>
-                        <td className="p-2">{month.newSkill3 || "-"}</td>
+                      <tr key={month.id || month.month} className="border-t hover:bg-gray-50">
+                        <td className="p-3 font-medium text-gray-800">{month.month}</td>
+                        <td className="p-3 text-gray-700">{month.newSkill1 || "-"}</td>
+                        <td className="p-3 text-gray-700">{month.newSkill2 || "-"}</td>
+                        <td className="p-3 text-gray-700">{month.newSkill3 || "-"}</td>
                       </tr>
                     ))
                   )}
