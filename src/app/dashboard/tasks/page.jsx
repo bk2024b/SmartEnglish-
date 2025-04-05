@@ -17,13 +17,11 @@ export default function TasksPage() {
   const [isAudioPopupOpen, setAudioPopupOpen] = useState(false);
   const [activitiesData, setActivitiesData] = useState([]);
   const [coachingStarted, setCoachingStarted] = useState(true);
-
-  // Rapports simulés (ces données viendraient normalement de votre backend)
-  const reportsStatus = {
-    daily: { completed: 15, total: 180 },
-    weekly: { completed: 2, total: 24 },
+  const [reportsStatus, setReportsStatus] = useState({
+    daily: { completed: 0, total: 180 },
+    weekly: { completed: 0, total: 24 },
     monthly: { completed: 0, total: 6 }
-  };
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -46,9 +44,20 @@ export default function TasksPage() {
           // Ne pas dépasser le total de jours
           const daysCompleted = Math.min(diffDays, 180);
           
+          // Calculer le nombre de semaines et mois écoulés
+          const weeksPassed = Math.floor(diffDays / 7);
+          const monthsPassed = Math.floor(diffDays / 30);
+          
           setProgress({
             daysCompleted,
             totalDays: 180
+          });
+          
+          // Mettre à jour les statuts des rapports en fonction de la date
+          setReportsStatus({
+            daily: { completed: daysCompleted, total: 180 },
+            weekly: { completed: Math.min(weeksPassed, 24), total: 24 },
+            monthly: { completed: Math.min(monthsPassed, 6), total: 6 }
           });
         }
       }
