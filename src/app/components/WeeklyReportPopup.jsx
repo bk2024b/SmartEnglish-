@@ -42,7 +42,7 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
     biggest_challenge: '',
     next_week_action: '',
     voice_record_sent: '',
-    user_id: null, // Récupération de l'ID utilisateur
+    profile_id: null, // Récupération de l'ID utilisateur
   });
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function WeeklyReportPopup({ isOpen, onClose, userId }) {
       }
       setFormData((prevData) => ({
         ...prevData,
-        user_id: data.user?.id || null, // Assurer que l'ID utilisateur est bien défini
+        profile_id: data.user?.id || null, // Assurer que l'ID utilisateur est bien défini
       }));
     };
 
