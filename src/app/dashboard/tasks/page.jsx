@@ -111,13 +111,6 @@ export default function TasksPage() {
 
       {/* Contenu principal: Rapports */}
       <section className="flex flex-col items-center justify-center flex-grow py-6">
-        {!coachingStarted ? (
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-300 to-purple-400 bg-clip-text text-transparent">
-              Le coaching commence le 7 avril 2025
-            </h2>
-          </div>
-        ) : (
           <>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
               Mes Rapports de Progression
@@ -185,7 +178,6 @@ export default function TasksPage() {
               </div>
             </div>
           </>
-        )}
       </section>
 
       {/* Pied de page : Menu de navigation */}
