@@ -125,13 +125,6 @@ export default function TasksPage() {
                     <h2 className="text-lg font-medium text-blue-400">Rapport Quotidien</h2>
                     <p className="text-gray-400 text-sm mt-1">Suivi de vos activités journalières</p>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className="bg-blue-900 bg-opacity-50 rounded-lg px-3 py-1 text-sm">
-                      <span className="text-blue-300 font-medium">{reportsStatus.daily.completed}</span>
-                      <span className="text-gray-400">/{reportsStatus.daily.total}</span>
-                    </div>
-                    <span className="text-xs text-gray-500 mt-1">rapports complétés</span>
-                  </div>
                 </div>
                 
                 <div className="mt-3 bg-gray-900 bg-opacity-50 rounded-full h-2 overflow-hidden">
@@ -152,13 +145,6 @@ export default function TasksPage() {
                     <h2 className="text-lg font-medium text-purple-400">Rapport Hebdomadaire</h2>
                     <p className="text-gray-400 text-sm mt-1">Bilan de votre semaine d'apprentissage</p>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className="bg-purple-900 bg-opacity-50 rounded-lg px-3 py-1 text-sm">
-                      <span className="text-purple-300 font-medium">{reportsStatus.weekly.completed}</span>
-                      <span className="text-gray-400">/{reportsStatus.weekly.total}</span>
-                    </div>
-                    <span className="text-xs text-gray-500 mt-1">rapports complétés</span>
-                  </div>
                 </div>
                 
                 <div className="mt-3 bg-gray-900 bg-opacity-50 rounded-full h-2 overflow-hidden">
@@ -178,13 +164,6 @@ export default function TasksPage() {
                   <div>
                     <h2 className="text-lg font-medium text-green-400">Rapport Mensuel</h2>
                     <p className="text-gray-400 text-sm mt-1">Synthèse mensuelle de vos progrès</p>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <div className="bg-green-900 bg-opacity-50 rounded-lg px-3 py-1 text-sm">
-                      <span className="text-green-300 font-medium">{reportsStatus.monthly.completed}</span>
-                      <span className="text-gray-400">/{reportsStatus.monthly.total}</span>
-                    </div>
-                    <span className="text-xs text-gray-500 mt-1">rapports complétés</span>
                   </div>
                 </div>
                 
