@@ -86,7 +86,7 @@ export default function Dashboard() {
               await supabase
                 .from('profiles')
                 .update({ daysCompleted })
-                .eq('id', user.id);  // Utilisez user_id au lieu de id
+                .eq('id', user.id);   // Utilisez user_id au lieu de id
             }
           }
           
