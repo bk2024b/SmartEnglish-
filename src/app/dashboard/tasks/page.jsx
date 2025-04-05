@@ -12,6 +12,7 @@ import MonthlyReportPopup from "../../components/MonthlyReportPopup";
 export default function TasksPage() {
   const [user, setUser] = useState(null);
   const [progress, setProgress] = useState({ daysCompleted: 0, totalDays: 180 });
+  const [userProfile, setUserProfile] = useState(null);
   const [isReportOpen, setReportOpen] = useState(null); // 'daily', 'weekly', 'monthly' ou null
   const [isActivitiesPopupOpen, setActivitiesPopupOpen] = useState(false);
   const [isAudioPopupOpen, setAudioPopupOpen] = useState(false);
@@ -27,13 +28,16 @@ export default function TasksPage() {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       // Étape 3: Récupérer le profil de l'utilisateur
-              const { data: profile, error } = await supabase
+      const { data: profile, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)  // Utilisez user_id au lieu de id
                 .single();
               
-              console.log("Profil récupéré:", profile, "Erreur:", error);
+      console.log("Profil récupéré:", profile, "Erreur:", error);
+      if (profile) {
+        setUserProfile(profile);
+      }
       
       if (user) {
         setUser(user);
