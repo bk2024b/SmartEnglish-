@@ -26,6 +26,14 @@ export default function TasksPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      // Étape 3: Récupérer le profil de l'utilisateur
+              const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)  // Utilisez user_id au lieu de id
+                .single();
+              
+              console.log("Profil récupéré:", profile, "Erreur:", error);
       
       if (user) {
         setUser(user);
@@ -69,7 +77,7 @@ export default function TasksPage() {
   const progressPercentage = Math.floor((progress.daysCompleted / progress.totalDays) * 100);
   
   // Obtenir le nom complet ou utiliser une valeur par défaut
-  const fullName = user?.user_metadata?.display_name || user?.email || "Utilisateur";
+  const fullName = userProfile?.full_name || user?.user_metadata?.display_name || user?.email || "Utilisateur";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col justify-between relative p-4 pb-20">
