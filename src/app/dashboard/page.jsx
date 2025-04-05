@@ -49,7 +49,7 @@ export default function Dashboard() {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('user_id', user.id)  // Utilisez user_id au lieu de id
+          .eq('id', user.id)  // Utilisez user_id au lieu de id
           .single();
         
         console.log("Profil récupéré:", profile, "Erreur:", error);
@@ -86,7 +86,7 @@ export default function Dashboard() {
               await supabase
                 .from('profiles')
                 .update({ daysCompleted })
-                .eq('user_id', user.id);  // Utilisez user_id au lieu de id
+                .eq('id', user.id);  // Utilisez user_id au lieu de id
             }
           }
           
@@ -112,7 +112,7 @@ export default function Dashboard() {
                 avatar: newAvatar,
                 weekBadge: diffWeeks
               })
-              .eq('user_id', user.id);  // Utilisez user_id au lieu de id
+              .eq('id', user.id);  // Utilisez user_id au lieu de id
           }
         } else {
           console.error("Erreur lors de la récupération du profil:", error);
