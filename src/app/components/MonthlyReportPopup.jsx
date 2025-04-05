@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
-import { useEffect } from 'react';
 
 export default function MonthlyReportPopup({ isOpen, onClose }) {
   // Si le popup n'est pas ouvert, ne rien afficher
   if (!isOpen) return null;
+  
+  // État pour suivre la soumission du formulaire
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   
   // Obtenir le mois actuel
   const getCurrentMonth = () => {
@@ -56,6 +60,8 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
   // Soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
     
     try {
       // Envoyer les données à Supabase
@@ -66,13 +72,19 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
       if (error) throw error;
       
       // Afficher le message de succès
-      alert("Bilan mensuel enregistré avec succès !");
-      onClose();
+      setSubmitSuccess(true);
+      
+      // Fermer le popup après 1,5 secondes
+      setTimeout(() => {
+        onClose();
+      }, 1500);
       
     } catch (error) {
       console.error("Erreur lors de l'envoi des données:", error);
-      
-    } 
+      setSubmitError("Une erreur est survenue lors de l'envoi du bilan. Veuillez réessayer.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -99,249 +111,278 @@ export default function MonthlyReportPopup({ isOpen, onClose }) {
               <p className="text-gray-300 text-sm">À compléter à la fin de chaque mois pour mesurer tes progrès et adapter ton apprentissage.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Mois */}
-              <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
-                <label className="block text-green-300 font-medium mb-2">Mois</label>
-                <select 
-                  name="month" 
-                  value={formData.month} 
-                  onChange={handleChange}
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
-                  required
-                >
-                  <option value="Janvier">Janvier</option>
-                  <option value="Février">Février</option>
-                  <option value="Mars">Mars</option>
-                  <option value="Avril">Avril</option>
-                  <option value="Mai">Mai</option>
-                  <option value="Juin">Juin</option>
-                  <option value="Juillet">Juillet</option>
-                  <option value="Août">Août</option>
-                  <option value="Septembre">Septembre</option>
-                  <option value="Octobre">Octobre</option>
-                  <option value="Novembre">Novembre</option>
-                  <option value="Décembre">Décembre</option>
-                </select>
+            {submitSuccess ? (
+              <div className="bg-green-500 bg-opacity-25 border border-green-500 text-green-100 rounded-lg p-4 text-center my-8">
+                <p className="text-lg font-medium">Bilan envoyé avec succès !</p>
+                <p className="text-sm mt-2">Merci pour ton retour mensuel.</p>
               </div>
-              
-              {/* Évaluation de la progression */}
-              <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
-                <label className="block text-green-300 font-medium mb-2">Comment évalues-tu ta progression ce mois-ci ?</label>
-                <div className="space-y-3">
-                  <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
-                    <input 
-                      type="radio" 
-                      name="progression_evaluation" 
-                      value="Lente mais je progresse" 
-                      checked={formData.progression_evaluation === "Lente mais je progresse"}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-green-500"
-                    />
-                    <span className="text-gray-300">Lente mais je progresse</span>
-                  </label>
-                  <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
-                    <input 
-                      type="radio" 
-                      name="progression_evaluation" 
-                      value="Bonne progression" 
-                      checked={formData.progression_evaluation === "Bonne progression"}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-green-500"
-                    />
-                    <span className="text-gray-300">Bonne progression</span>
-                  </label>
-                  <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
-                    <input 
-                      type="radio" 
-                      name="progression_evaluation" 
-                      value="Très grande amélioration !" 
-                      checked={formData.progression_evaluation === "Très grande amélioration !"}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-green-500"
-                    />
-                    <span className="text-gray-300">Très grande amélioration !</span>
-                  </label>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Mois */}
+                <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
+                  <label className="block text-green-300 font-medium mb-2">Mois</label>
+                  <select 
+                    name="month" 
+                    value={formData.month} 
+                    onChange={handleChange}
+                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
+                    required
+                  >
+                    <option value="Janvier">Janvier</option>
+                    <option value="Février">Février</option>
+                    <option value="Mars">Mars</option>
+                    <option value="Avril">Avril</option>
+                    <option value="Mai">Mai</option>
+                    <option value="Juin">Juin</option>
+                    <option value="Juillet">Juillet</option>
+                    <option value="Août">Août</option>
+                    <option value="Septembre">Septembre</option>
+                    <option value="Octobre">Octobre</option>
+                    <option value="Novembre">Novembre</option>
+                    <option value="Décembre">Décembre</option>
+                  </select>
                 </div>
-              </div>
-              
-              {/* Changements remarqués */}
-              <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
-                <label className="block text-green-300 font-medium mb-2">Quels changements as-tu remarqués dans ta compréhension et ton expression orale ?</label>
-                <textarea 
-                  name="changes_noticed" 
-                  value={formData.changes_noticed} 
-                  onChange={handleChange}
-                  placeholder="Décrivez brièvement les changements que vous avez remarqués..."
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors h-24 resize-none"
-                ></textarea>
-              </div>
-              
-              {/* Plus grand challenge */}
-              <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
-                <label className="block text-green-300 font-medium mb-2">Quel a été ton plus grand challenge ce mois-ci ?</label>
-                <textarea 
-                  name="biggest_monthly_challenge" 
-                  value={formData.biggest_monthly_challenge} 
-                  onChange={handleChange}
-                  placeholder="Exemple : trouver du temps, surmonter la peur de parler..."
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors h-24 resize-none"
-                ></textarea>
-              </div>
-              
-              {/* Nouvelles compétences */}
-              <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
-                <label className="block text-green-300 font-medium mb-2">Quelles sont les 3 nouvelles choses que tu sais faire en anglais aujourd'hui que tu ne pouvais pas faire au début du programme ?</label>
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <span className="text-gray-300 font-medium mr-2 min-w-[24px]">1.</span>
-                    <input 
-                      type="text" 
-                      name="newSkill1" 
-                      value={formData.newSkill1} 
-                      onChange={handleChange}
-                      placeholder="Nouvelle compétence 1"
-                      className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-gray-300 font-medium mr-2 min-w-[24px]">2.</span>
-                    <input 
-                      type="text" 
-                      name="newSkill2" 
-                      value={formData.newSkill2} 
-                      onChange={handleChange}
-                      placeholder="Nouvelle compétence 2"
-                      className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-gray-300 font-medium mr-2 min-w-[24px]">3.</span>
-                    <input 
-                      type="text" 
-                      name="newSkill3" 
-                      value={formData.newSkill3} 
-                      onChange={handleChange}
-                      placeholder="Nouvelle compétence 3"
-                      className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
-                    />
+                
+                {/* Évaluation de la progression */}
+                <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
+                  <label className="block text-green-300 font-medium mb-2">Comment évalues-tu ta progression ce mois-ci ?</label>
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
+                      <input 
+                        type="radio" 
+                        name="progression_evaluation" 
+                        value="Lente mais je progresse" 
+                        checked={formData.progression_evaluation === "Lente mais je progresse"}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-green-500"
+                        required
+                      />
+                      <span className="text-gray-300">Lente mais je progresse</span>
+                    </label>
+                    <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
+                      <input 
+                        type="radio" 
+                        name="progression_evaluation" 
+                        value="Bonne progression" 
+                        checked={formData.progression_evaluation === "Bonne progression"}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-green-500"
+                      />
+                      <span className="text-gray-300">Bonne progression</span>
+                    </label>
+                    <label className="flex items-center space-x-2 bg-gray-800 p-3 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors w-full">
+                      <input 
+                        type="radio" 
+                        name="progression_evaluation" 
+                        value="Très grande amélioration !" 
+                        checked={formData.progression_evaluation === "Très grande amélioration !"}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-green-500"
+                      />
+                      <span className="text-gray-300">Très grande amélioration !</span>
+                    </label>
                   </div>
                 </div>
-              </div>
-              
-              {/* Score de confiance */}
-              <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
-                <label className="block text-green-300 font-medium mb-2">Sur une échelle de 1 à 5, comment te sens-tu en confiance pour parler anglais maintenant ?</label>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
-                  <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
-                    <input 
-                      type="radio" 
-                      name="confidence_score" 
-                      value="1" 
-                      checked={formData.confidence_score === "1"}
-                      onChange={handleChange}
-                      className="hidden"
-                    />
-                    <span className={`text-xl font-bold ${formData.confidence_score === "1" ? "text-green-400" : "text-gray-400"}`}>1</span>
-                    <span className="text-xs text-gray-400">Toujours stressé(e)</span>
-                  </label>
-                  <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
-                    <input 
-                      type="radio" 
-                      name="confidence_score" 
-                      value="2" 
-                      checked={formData.confidence_score === "2"}
-                      onChange={handleChange}
-                      className="hidden"
-                    />
-                    <span className={`text-xl font-bold ${formData.confidence_score === "2" ? "text-green-400" : "text-gray-400"}`}>2</span>
-                    <span className="text-xs text-gray-400">Encore difficile</span>
-                  </label>
-                  <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
-                    <input 
-                      type="radio" 
-                      name="confidence_score" 
-                      value="3" 
-                      checked={formData.confidence_score === "3"}
-                      onChange={handleChange}
-                      className="hidden"
-                    />
-                    <span className={`text-xl font-bold ${formData.confidence_score === "3" ? "text-green-400" : "text-gray-400"}`}>3</span>
-                    <span className="text-xs text-gray-400">Je m'améliore</span>
-                  </label>
-                  <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
-                    <input 
-                      type="radio" 
-                      name="confidence_score" 
-                      value="4" 
-                      checked={formData.confidence_score === "4"}
-                      onChange={handleChange}
-                      className="hidden"
-                    />
-                    <span className={`text-xl font-bold ${formData.confidence_score === "4" ? "text-green-400" : "text-gray-400"}`}>4</span>
-                    <span className="text-xs text-gray-400">Presque fluide</span>
-                  </label>
-                  <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
-                    <input 
-                      type="radio" 
-                      name="confidence_score" 
-                      value="5" 
-                      checked={formData.confidence_score === "5"}
-                      onChange={handleChange}
-                      className="hidden"
-                    />
-                    <span className={`text-xl font-bold ${formData.confidence_score === "5" ? "text-green-400" : "text-gray-400"}`}>5</span>
-                    <span className="text-xs text-gray-400">Je parle sans problème !</span>
-                  </label>
+                
+                {/* Changements remarqués */}
+                <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
+                  <label className="block text-green-300 font-medium mb-2">Quels changements as-tu remarqués dans ta compréhension et ton expression orale ?</label>
+                  <textarea 
+                    name="changes_noticed" 
+                    value={formData.changes_noticed} 
+                    onChange={handleChange}
+                    placeholder="Décrivez brièvement les changements que vous avez remarqués..."
+                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors h-24 resize-none"
+                    required
+                  ></textarea>
                 </div>
-              </div>
-              
-              {/* Enregistrement vocal */}
-              <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
-                <label className="block text-green-300 font-medium mb-2">Enregistrement vocal mensuel envoyé ?</label>
-                <div className="flex gap-3">
-                  <label className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors">
-                    <input 
-                      type="radio" 
-                      name="voice_record_sent" 
-                      value="Oui" 
-                      checked={formData.voice_record_sent === "Oui"}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-green-500"
-                    />
-                    <span className="text-gray-300">Oui</span>
-                  </label>
-                  <label className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors">
-                    <input 
-                      type="radio" 
-                      name="voice_record_sent" 
-                      value="Non" 
-                      checked={formData.voice_record_sent === "Non"}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-green-500"
-                    />
-                    <span className="text-gray-300">Non</span>
-                  </label>
+                
+                {/* Plus grand challenge */}
+                <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
+                  <label className="block text-green-300 font-medium mb-2">Quel a été ton plus grand challenge ce mois-ci ?</label>
+                  <textarea 
+                    name="biggest_monthly_challenge" 
+                    value={formData.biggest_monthly_challenge} 
+                    onChange={handleChange}
+                    placeholder="Exemple : trouver du temps, surmonter la peur de parler..."
+                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors h-24 resize-none"
+                    required
+                  ></textarea>
                 </div>
-              </div>
-              
-              {/* Boutons d'action */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-full sm:w-1/2 px-4 py-3 rounded-lg bg-gray-700 text-gray-300 font-medium hover:bg-gray-600 transition-colors"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  className="w-full sm:w-1/2 px-4 py-3 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium hover:from-green-600 hover:to-teal-600 transition-colors shadow-lg"
-                >
-                  Soumettre mon bilan
-                </button>
-              </div>
-            </form>
+                
+                {/* Nouvelles compétences */}
+                <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
+                  <label className="block text-green-300 font-medium mb-2">Quelles sont les 3 nouvelles choses que tu sais faire en anglais aujourd'hui que tu ne pouvais pas faire au début du programme ?</label>
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <span className="text-gray-300 font-medium mr-2 min-w-[24px]">1.</span>
+                      <input 
+                        type="text" 
+                        name="newSkill1" 
+                        value={formData.newSkill1} 
+                        onChange={handleChange}
+                        placeholder="Nouvelle compétence 1"
+                        className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-gray-300 font-medium mr-2 min-w-[24px]">2.</span>
+                      <input 
+                        type="text" 
+                        name="newSkill2" 
+                        value={formData.newSkill2} 
+                        onChange={handleChange}
+                        placeholder="Nouvelle compétence 2"
+                        className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-gray-300 font-medium mr-2 min-w-[24px]">3.</span>
+                      <input 
+                        type="text" 
+                        name="newSkill3" 
+                        value={formData.newSkill3} 
+                        onChange={handleChange}
+                        placeholder="Nouvelle compétence 3"
+                        className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-green-400 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Score de confiance */}
+                <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
+                  <label className="block text-green-300 font-medium mb-2">Sur une échelle de 1 à 5, comment te sens-tu en confiance pour parler anglais maintenant ?</label>
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+                    <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
+                      <input 
+                        type="radio" 
+                        name="confidence_score" 
+                        value="1" 
+                        checked={formData.confidence_score === "1"}
+                        onChange={handleChange}
+                        className="hidden"
+                        required
+                      />
+                      <span className={`text-xl font-bold ${formData.confidence_score === "1" ? "text-green-400" : "text-gray-400"}`}>1</span>
+                      <span className="text-xs text-gray-400">Toujours stressé(e)</span>
+                    </label>
+                    <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
+                      <input 
+                        type="radio" 
+                        name="confidence_score" 
+                        value="2" 
+                        checked={formData.confidence_score === "2"}
+                        onChange={handleChange}
+                        className="hidden"
+                      />
+                      <span className={`text-xl font-bold ${formData.confidence_score === "2" ? "text-green-400" : "text-gray-400"}`}>2</span>
+                      <span className="text-xs text-gray-400">Encore difficile</span>
+                    </label>
+                    <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
+                      <input 
+                        type="radio" 
+                        name="confidence_score" 
+                        value="3" 
+                        checked={formData.confidence_score === "3"}
+                        onChange={handleChange}
+                        className="hidden"
+                      />
+                      <span className={`text-xl font-bold ${formData.confidence_score === "3" ? "text-green-400" : "text-gray-400"}`}>3</span>
+                      <span className="text-xs text-gray-400">Je m'améliore</span>
+                    </label>
+                    <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
+                      <input 
+                        type="radio" 
+                        name="confidence_score" 
+                        value="4" 
+                        checked={formData.confidence_score === "4"}
+                        onChange={handleChange}
+                        className="hidden"
+                      />
+                      <span className={`text-xl font-bold ${formData.confidence_score === "4" ? "text-green-400" : "text-gray-400"}`}>4</span>
+                      <span className="text-xs text-gray-400">Presque fluide</span>
+                    </label>
+                    <label className="flex flex-col items-center p-3 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-all text-center space-y-1 hover:bg-gray-700">
+                      <input 
+                        type="radio" 
+                        name="confidence_score" 
+                        value="5" 
+                        checked={formData.confidence_score === "5"}
+                        onChange={handleChange}
+                        className="hidden"
+                      />
+                      <span className={`text-xl font-bold ${formData.confidence_score === "5" ? "text-green-400" : "text-gray-400"}`}>5</span>
+                      <span className="text-xs text-gray-400">Je parle sans problème !</span>
+                    </label>
+                  </div>
+                </div>
+                
+                {/* Enregistrement vocal */}
+                <div className="bg-gray-700 bg-opacity-30 rounded-lg p-4">
+                  <label className="block text-green-300 font-medium mb-2">Enregistrement vocal mensuel envoyé ?</label>
+                  <div className="flex gap-3">
+                    <label className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors">
+                      <input 
+                        type="radio" 
+                        name="voice_record_sent" 
+                        value="Oui" 
+                        checked={formData.voice_record_sent === "Oui"}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-green-500"
+                        required
+                      />
+                      <span className="text-gray-300">Oui</span>
+                    </label>
+                    <label className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 hover:border-green-400 cursor-pointer transition-colors">
+                      <input 
+                        type="radio" 
+                        name="voice_record_sent" 
+                        value="Non" 
+                        checked={formData.voice_record_sent === "Non"}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-green-500"
+                      />
+                      <span className="text-gray-300">Non</span>
+                    </label>
+                  </div>
+                  {formData.voice_record_sent === "Non" && (
+                    <div className="mt-3 p-3 bg-gray-800 rounded-lg border border-green-800 text-gray-300 text-sm">
+                      N'oublie pas d'envoyer ton enregistrement mensuel pour que ton coach puisse évaluer ta progression !
+                    </div>
+                  )}
+                </div>
+                
+                {/* Message d'erreur */}
+                {submitError && (
+                  <div className="bg-red-500 bg-opacity-25 border border-red-500 text-red-100 rounded-lg p-3 text-sm">
+                    {submitError}
+                  </div>
+                )}
+                
+                {/* Boutons d'action */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="w-full sm:w-1/2 px-4 py-3 rounded-lg bg-gray-700 text-gray-300 font-medium hover:bg-gray-600 transition-colors"
+                    disabled={isSubmitting}
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    className={`w-full sm:w-1/2 px-4 py-3 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium hover:from-green-600 hover:to-teal-600 transition-colors shadow-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Envoi en cours...' : 'Soumettre mon bilan'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       </div>

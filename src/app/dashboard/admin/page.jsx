@@ -51,13 +51,14 @@ export default function AdminDashboard  () {
       
       // Fallback en cas d'erreur d'autorisation pour l'admin.listUsers
       try {
+        // Note: No "auth." prefix in the table name when using from()
         const { data: authData, error: authError } = await supabase
-          .from('auth.users')
+          .from('users')  // Or whatever your actual table name is
           .select('id, email');
         
         if (authError) throw authError;
-        setUsers(authData);
-        if (authData.length > 0) setSelectedUser(authData[0].id);
+        setUsers(authData || []);
+        if (authData?.length > 0) setSelectedUser(authData[0].id);
       } catch (fallbackError) {
         console.error('Erreur lors de la récupération fallback des utilisateurs:', fallbackError);
       }
