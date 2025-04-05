@@ -102,7 +102,13 @@ export default function TasksPage() {
 
       {/* Contenu principal: Rapports */}
       <section className="flex flex-col items-center justify-center flex-grow py-6">
-        
+        {!coachingStarted ? (
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-300 to-purple-400 bg-clip-text text-transparent">
+              Le coaching commence le 7 avril 2025
+            </h2>
+          </div>
+        ) : (
           <>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
               Mes Rapports de Progression
@@ -110,7 +116,7 @@ export default function TasksPage() {
             
             <div className="w-full max-w-md space-y-4">
               {/* Rapport quotidien */}
-              <div 
+              <div
                 className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl p-4 shadow-lg border border-gray-700 hover:border-blue-500 transition-all cursor-pointer"
                 onClick={() => setReportOpen('daily')}
               >
@@ -129,15 +135,15 @@ export default function TasksPage() {
                 </div>
                 
                 <div className="mt-3 bg-gray-900 bg-opacity-50 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-blue-400 h-full" 
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-blue-400 h-full"
                     style={{ width: `${(reportsStatus.daily.completed / reportsStatus.daily.total) * 100}%` }}
                   ></div>
                 </div>
               </div>
               
               {/* Rapport hebdomadaire */}
-              <div 
+              <div
                 className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl p-4 shadow-lg border border-gray-700 hover:border-purple-500 transition-all cursor-pointer"
                 onClick={() => setReportOpen('weekly')}
               >
@@ -156,15 +162,15 @@ export default function TasksPage() {
                 </div>
                 
                 <div className="mt-3 bg-gray-900 bg-opacity-50 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-purple-500 to-purple-400 h-full" 
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-purple-400 h-full"
                     style={{ width: `${(reportsStatus.weekly.completed / reportsStatus.weekly.total) * 100}%` }}
                   ></div>
                 </div>
               </div>
               
               {/* Rapport mensuel */}
-              <div 
+              <div
                 className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl p-4 shadow-lg border border-gray-700 hover:border-green-500 transition-all cursor-pointer"
                 onClick={() => setReportOpen('monthly')}
               >
@@ -183,15 +189,15 @@ export default function TasksPage() {
                 </div>
                 
                 <div className="mt-3 bg-gray-900 bg-opacity-50 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-green-500 to-green-400 h-full" 
+                  <div
+                    className="bg-gradient-to-r from-green-500 to-green-400 h-full"
                     style={{ width: `${(reportsStatus.monthly.completed / reportsStatus.monthly.total) * 100}%` }}
                   ></div>
                 </div>
               </div>
             </div>
           </>
-        
+        )}
       </section>
 
       {/* Pied de page : Menu de navigation */}
