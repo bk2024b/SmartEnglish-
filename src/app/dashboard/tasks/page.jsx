@@ -16,7 +16,7 @@ export default function TasksPage() {
   const [isActivitiesPopupOpen, setActivitiesPopupOpen] = useState(false);
   const [isAudioPopupOpen, setAudioPopupOpen] = useState(false);
   const [activitiesData, setActivitiesData] = useState([]);
-  const [coachingStarted, setCoachingStarted] = useState(false);
+  const [coachingStarted, setCoachingStarted] = useState(true);
 
   // Rapports simulés (ces données viendraient normalement de votre backend)
   const reportsStatus = {
