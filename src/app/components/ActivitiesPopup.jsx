@@ -183,7 +183,7 @@ export default function ActivitiesPopup({ isOpen, onClose }) {
                   Ressources d'apprentissage
                 </h3>
                 <p className="text-gray-200 text-sm mb-3">
-                  Pour accéder aux audios, vidéos et documents nécessaires pour ces activités, rejoignez notre groupe d'apprentissage.
+                  Accédez aux audios, vidéos et documents nécessaires pour les activités du jour dans le canal Telgram.
                 </p>
                 <button
                   onClick={handleTelegramAccess}
