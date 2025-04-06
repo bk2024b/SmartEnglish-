@@ -45,7 +45,7 @@ export default function TasksPage() {
         // Vérifier si le coaching a commencé
         const startDate = new Date('2025-04-07');
         const currentDate = new Date();
-        const hasCoachingStarted = currentDate >= startDate;
+        const hasCoachingStarted = currentDate = startDate;
         setCoachingStarted(hasCoachingStarted);
         
         if (hasCoachingStarted) {
