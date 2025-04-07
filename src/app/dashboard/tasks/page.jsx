@@ -17,7 +17,7 @@ export default function TasksPage() {
   const [isActivitiesPopupOpen, setActivitiesPopupOpen] = useState(false);
   const [isAudioPopupOpen, setAudioPopupOpen] = useState(false);
   const [activitiesData, setActivitiesData] = useState([]);
-  const [coachingStarted, setCoachingStarted] = useState(true);
+  const [coachingStarted, setCoachingStarted] = useState(false);
   const [reportsStatus, setReportsStatus] = useState({
     daily: { completed: 0, total: 180 },
     weekly: { completed: 0, total: 24 },
@@ -27,38 +27,40 @@ export default function TasksPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      // Étape 3: Récupérer le profil de l'utilisateur
-      const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)  // Utilisez user_id au lieu de id
-                .single();
-              
-      console.log("Profil récupéré:", profile, "Erreur:", error);
-      if (profile) {
-        setUserProfile(profile);
-      }
       
       if (user) {
         setUser(user);
+        
+        // Étape 1: Récupérer le profil de l'utilisateur
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+              
+        console.log("Profil récupéré:", profile, "Erreur:", error);
+        if (profile) {
+          setUserProfile(profile);
+        }
 
-        // Vérifier si le coaching a commencé
+        // Étape 2: Vérifier si le coaching a commencé
         const startDate = new Date('2025-04-07');
         const currentDate = new Date();
-        const hasCoachingStarted = currentDate = startDate;
+        // Correction: Vérification que la date courante est égale ou postérieure à la date de début
+        const hasCoachingStarted = currentDate >= startDate;
         setCoachingStarted(hasCoachingStarted);
         
         if (hasCoachingStarted) {
-          // Calculer le nombre de jours écoulés depuis le début du coaching
+          // Calculer le nombre de jours écoulés depuis le début du coaching (aujourd'hui = jour 1)
           const diffTime = currentDate - startDate;
-          const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+          const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
           
           // Ne pas dépasser le total de jours
           const daysCompleted = Math.min(diffDays, 180);
           
-          // Calculer le nombre de semaines et mois écoulés
-          const weeksPassed = Math.floor(diffDays / 7);
-          const monthsPassed = Math.floor(diffDays / 30);
+          // Calculer le nombre de semaines et mois écoulés (en commençant à 1 pour aujourd'hui)
+          const weeksPassed = Math.max(1, Math.ceil(diffDays / 7));
+          const monthsPassed = Math.max(1, Math.ceil(diffDays / 30));
           
           setProgress({
             daysCompleted,
@@ -67,7 +69,7 @@ export default function TasksPage() {
           
           // Mettre à jour les statuts des rapports en fonction de la date
           setReportsStatus({
-            daily: { completed: daysCompleted, total: 180 },
+            daily: { completed: Math.min(daysCompleted, 180), total: 180 },
             weekly: { completed: Math.min(weeksPassed, 24), total: 24 },
             monthly: { completed: Math.min(monthsPassed, 6), total: 6 }
           });
@@ -123,6 +125,13 @@ export default function TasksPage() {
 
       {/* Contenu principal: Rapports */}
       <section className="flex flex-col items-center justify-center flex-grow py-6">
+        {!coachingStarted ? (
+          <div className="text-center">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-300 to-purple-400 bg-clip-text text-transparent">
+              Le coaching commence le 7 avril 2025
+            </h2>
+          </div>
+        ) : (
           <>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
               Mes Rapports de Progression
@@ -138,6 +147,9 @@ export default function TasksPage() {
                   <div>
                     <h2 className="text-lg font-medium text-blue-400">Rapport Quotidien</h2>
                     <p className="text-gray-400 text-sm mt-1">Suivi de vos activités journalières</p>
+                  </div>
+                  <div className="text-xs text-blue-300">
+                    Jour {reportsStatus.daily.completed}
                   </div>
                 </div>
                 
@@ -159,6 +171,9 @@ export default function TasksPage() {
                     <h2 className="text-lg font-medium text-purple-400">Rapport Hebdomadaire</h2>
                     <p className="text-gray-400 text-sm mt-1">Bilan de votre semaine d'apprentissage</p>
                   </div>
+                  <div className="text-xs text-purple-300">
+                    Semaine {reportsStatus.weekly.completed}
+                  </div>
                 </div>
                 
                 <div className="mt-3 bg-gray-900 bg-opacity-50 rounded-full h-2 overflow-hidden">
@@ -179,6 +194,9 @@ export default function TasksPage() {
                     <h2 className="text-lg font-medium text-green-400">Rapport Mensuel</h2>
                     <p className="text-gray-400 text-sm mt-1">Synthèse mensuelle de vos progrès</p>
                   </div>
+                  <div className="text-xs text-green-300">
+                    Mois {reportsStatus.monthly.completed}
+                  </div>
                 </div>
                 
                 <div className="mt-3 bg-gray-900 bg-opacity-50 rounded-full h-2 overflow-hidden">
@@ -190,6 +208,7 @@ export default function TasksPage() {
               </div>
             </div>
           </>
+        )}
       </section>
 
       {/* Pied de page : Menu de navigation */}
