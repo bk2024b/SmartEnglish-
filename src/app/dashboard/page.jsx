@@ -40,16 +40,18 @@ export default function Dashboard() {
         setIsAdmin(user.email === "senamijonas@gmail.com");
         
         // Étape 2: Vérifier si le coaching a commencé
-        const startDate = new Date('2025-04-07');
+        const startDate = new Date('2025-04-07'); // Date fixe du début du coaching
         const currentDate = new Date();
-        const hasCoachingStarted = true;
+        
+        // Vérification que la date courante est égale ou postérieure à la date de début
+        const hasCoachingStarted = currentDate >= startDate;
         setCoachingStarted(hasCoachingStarted);
         
         // Étape 3: Récupérer le profil de l'utilisateur
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)  // Utilisez user_id au lieu de id
+          .eq('id', user.id)
           .single();
         
         console.log("Profil récupéré:", profile, "Erreur:", error);
@@ -68,9 +70,9 @@ export default function Dashboard() {
           });
           
           if (hasCoachingStarted) {
-            // Calculer le nombre de jours écoulés depuis le début du coaching
+            // Calculer le nombre de jours écoulés depuis le début du coaching (aujourd'hui = jour 1)
             const diffTime = currentDate - startDate;
-            const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+            const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
             
             // Ne pas dépasser le total de jours
             const daysCompleted = Math.min(diffDays, profile.totalDays || 180);
@@ -86,33 +88,33 @@ export default function Dashboard() {
               await supabase
                 .from('profiles')
                 .update({ daysCompleted })
-                .eq('id', user.id);   // Utilisez user_id au lieu de id
+                .eq('id', user.id);
             }
-          }
-          
-          // Calculer le nombre de semaines depuis le 7 avril 2025
-          const diffTime = currentDate - startDate;
-          const diffWeeks = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 7)) + 1);
-          setWeekBadge(diffWeeks);
-          
-          // Calculer le niveau en fonction du nombre de mois écoulés
-          const diffMonths = Math.max(1, Math.floor(Math.max(0, diffTime) / (1000 * 60 * 60 * 24 * 30)) + 1);
-          setLevel(diffMonths);
-          
-          // Déterminer l'avatar en fonction du mois
-          const avatarIndex = Math.min(diffMonths - 1, avatars.length - 1);
-          const newAvatar = avatars[avatarIndex];
-          setAvatarUrl(newAvatar);
-          
-          // Mise à jour dans Supabase si nécessaire
-          if (profile.avatar !== newAvatar || profile.weekBadge !== diffWeeks) {
-            await supabase
-              .from('profiles')
-              .update({ 
-                avatar: newAvatar,
-                weekBadge: diffWeeks
-              })
-              .eq('id', user.id);  // Utilisez user_id au lieu de id
+            
+            // Calculer le nombre de semaines depuis le 7 avril 2025 (première semaine = 1)
+            const diffWeeks = Math.max(1, Math.ceil(diffDays / 7));
+            setWeekBadge(diffWeeks);
+            
+            // Calculer le niveau en fonction du nombre de jours écoulés (un niveau par mois environ)
+            // Aujourd'hui = niveau 1, premier mois = niveau 1
+            const diffMonths = Math.max(1, Math.ceil(diffDays / 30));
+            setLevel(diffMonths);
+            
+            // Déterminer l'avatar en fonction du mois
+            const avatarIndex = Math.min(diffMonths - 1, avatars.length - 1);
+            const newAvatar = avatars[avatarIndex];
+            setAvatarUrl(newAvatar);
+            
+            // Mise à jour dans Supabase si nécessaire
+            if (profile.avatar !== newAvatar || profile.weekBadge !== diffWeeks) {
+              await supabase
+                .from('profiles')
+                .update({ 
+                  avatar: newAvatar,
+                  weekBadge: diffWeeks
+                })
+                .eq('id', user.id);
+            }
           }
         } else {
           console.error("Erreur lors de la récupération du profil:", error);
@@ -197,7 +199,7 @@ export default function Dashboard() {
             <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-300 to-purple-400 bg-clip-text text-transparent">
               Parcours d'apprentissage
             </h2>
-            <p className="text-gray-400 text-sm mt-1">Continuez vos tâches quotidiennes</p>
+            <p className="text-gray-400 text-sm mt-1">Jour {progress.daysCompleted} - Continuez vos tâches quotidiennes</p>
           </div>
         )}
         
