@@ -1,12 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { LayoutGrid, Users, Calendar, BarChart } from 'lucide-react';
+import { LayoutGrid, Users, Calendar, BarChart, Menu, X } from 'lucide-react';
 
 export default function Layout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+      {/* Mobile menu button */}
+      <div className="md:hidden p-4 bg-white shadow-sm">
+        <button 
+          onClick={toggleSidebar}
+          className="p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+        >
+          {sidebarOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
+      </div>
+      
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md">
+      <aside className={`${
+        sidebarOpen ? 'block' : 'hidden'
+      } md:block w-full md:w-64 bg-white shadow-md md:min-h-screen z-10`}>
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
         </div>
@@ -29,6 +51,14 @@ export default function Layout({ children }) {
           </Link>
         </nav>
       </aside>
+
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-gray-600 bg-opacity-50 z-0"
+          onClick={toggleSidebar}
+        ></div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden overflow-y-auto">
