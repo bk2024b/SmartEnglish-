@@ -41,14 +41,20 @@ export default function CoachAdminDashboard() {
 
     const fetchProgressData = async () => {
       setIsLoading(true);
-
+      // Ajouter une vérification
+      const activitiesList = item.activities_done 
+      ? (typeof item.activities_done === 'string' 
+         ? JSON.parse(item.activities_done) 
+         : item.activities_done)
+      : [];
       try {
         if (activeTab === 'daily') {
           const { data, error } = await supabase
             .from('daily_progress')
             .select('*')
-            .eq(viewMode === 'individual' ? 'profile_id' : '', viewMode === 'individual' ? selectedProfile : '');
-
+            viewMode === 'individual' 
+              ? query.eq('profile_id', selectedProfile)
+              : query // Sans condition pour obtenir toutes les données
           if (error) throw error;
           setDailyProgress(data);
         } 
@@ -69,9 +75,12 @@ export default function CoachAdminDashboard() {
 
           if (error) throw error;
           setMonthlyProgress(data);
+          console.log('Fetched data:', data);
+          console.log('Current state:', { viewMode, selectedProfile, activeTab });
         }
       } catch (error) {
         console.error('Error fetching progress data:', error);
+        
       } finally {
         setIsLoading(false);
       }
