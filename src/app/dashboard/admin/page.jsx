@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabaseClient';
-import ActivityFormPopup from './ActivityFormPopup';
+import ActivityFormPopup from '../../components/ActivityFormPopup';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function CoachAdminDashboard() {
