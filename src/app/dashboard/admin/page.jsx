@@ -281,7 +281,18 @@ export default function AdminDashboard() {
                         )}
                       </ul>
                     </div>
-                    
+                    <button 
+  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+  onClick={() => {
+    // Rechargement forcé des données
+    if (selectedUser) {
+      console.log('Force refreshing data for user:', selectedUser);
+      // Réexécuter vos fetchFormData ici
+    }
+  }}
+>
+  Actualiser les données
+</button>
                     {item.voice_record_sent && (
                       <div className="md:col-span-2">
                         <h3 className="font-medium text-gray-700 mb-2">Enregistrement vocal</h3>
