@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { LayoutGrid, Users, Calendar, BarChart, Menu, X } from 'lucide-react';
