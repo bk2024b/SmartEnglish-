@@ -17,28 +17,28 @@ function App() {
           </div>
           <nav className="mt-6">
             <Link
-              to="/"
+              href="/"
               className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100"
             >
               <LayoutGrid className="w-5 h-5 mr-3" />
               Dashboard
             </Link>
             <Link
-              to="/students"
+              href="/students"
               className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100"
             >
               <Users className="w-5 h-5 mr-3" />
               Students
             </Link>
             <Link
-              to="/activities"
+              href="/activities"
               className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100"
             >
               <Calendar className="w-5 h-5 mr-3" />
               Activities
             </Link>
             <Link
-              to="/analytics"
+              href="/analytics"
               className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100"
             >
               <BarChart className="w-5 h-5 mr-3" />
