@@ -41,12 +41,7 @@ export default function CoachAdminDashboard() {
 
     const fetchProgressData = async () => {
       setIsLoading(true);
-      // Ajouter une vérification
-      const activitiesList = item.activities_done 
-      ? (typeof item.activities_done === 'string' 
-         ? JSON.parse(item.activities_done) 
-         : item.activities_done)
-      : [];
+      
       try {
         if (activeTab === 'daily') {
           const { data, error } = await supabase
