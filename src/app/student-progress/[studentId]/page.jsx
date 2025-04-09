@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import StudentProgress from '../../components/StudentProgress';
+import StudentProgress from '@/app/components/StudentProgress';
 
 export default function StudentProgressPage({ params }) {
   return (
