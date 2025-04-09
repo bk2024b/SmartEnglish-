@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { format } from 'date-fns';
 import { PlusCircle, ChevronRight, ChevronLeft } from 'lucide-react';
+import Link from 'next/link'; // Add this import
 
 function Dashboard() {
   const [dailyProgress, setDailyProgress] = useState([]);
@@ -142,12 +143,12 @@ function Dashboard() {
                       </span>
                     </td>
                     <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button 
+                      <Link 
+                        href={`/student-progress/${progress.profile_id}`}
                         className="text-blue-600 hover:text-blue-900"
-                        onClick={() => window.location.href = `/student-progress/${progress.profile_id}`}
                       >
                         View Details
-                      </button>
+                      </Link>
                     </td>
                   </tr>
                 ))}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import Link from 'next/link';
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -28,10 +29,6 @@ function Students() {
     }
   }
 
-  const handleViewProgress = (studentId) => {
-    window.location.href = `/student-progress/${studentId}`;
-  };
-
   return (
     <div className="p-4 md:p-6">
       <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">Students</h1>
@@ -47,12 +44,12 @@ function Students() {
               <h3 className="text-lg font-semibold text-gray-900">{student.full_name}</h3>
               <p className="text-gray-600 text-sm truncate">{student.email}</p>
               <div className="mt-4">
-                <button 
+                <Link 
+                  href={`/student-progress/${student.id}`}
                   className="text-blue-600 hover:text-blue-900 font-medium"
-                  onClick={() => handleViewProgress(student.id)}
                 >
                   View Progress
-                </button>
+                </Link>
               </div>
             </div>
           ))}
