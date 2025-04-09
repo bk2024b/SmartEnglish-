@@ -44,12 +44,12 @@ function Students() {
               <h3 className="text-lg font-semibold text-gray-900">{student.full_name}</h3>
               <p className="text-gray-600 text-sm truncate">{student.email}</p>
               <div className="mt-4">
-                <Link 
-                  href={`/student-progress/${student.id}`}
-                  className="text-blue-600 hover:text-blue-900 font-medium"
-                >
-                  View Progress
-                </Link>
+              <a 
+                href={`/student-progress/${student.id}`}
+                className="text-blue-600 hover:text-blue-900 font-medium"
+              >
+                View Progress
+              </a>
               </div>
             </div>
           ))}
