@@ -44,12 +44,19 @@ function Students() {
               <h3 className="text-lg font-semibold text-gray-900">{student.full_name}</h3>
               <p className="text-gray-600 text-sm truncate">{student.email}</p>
               <div className="mt-4">
-              <a 
-                href={`/student-progress/${student.id}`}
-                className="text-blue-600 hover:text-blue-900 font-medium"
-              >
-                View Progress
-              </a>
+              <Link 
+              href={student.id ? `/student-progress/${student.id}` : "#"}
+              className="text-blue-600 hover:text-blue-900 font-medium"
+              onClick={(e) => {
+                console.log("Student ID:", student.id);
+                if (!student.id) {
+                  e.preventDefault();
+                  alert("No student ID available");
+                }
+              }}
+            >
+              View Progress
+            </Link>
               </div>
             </div>
           ))}
