@@ -8,7 +8,6 @@ import { ArrowLeft } from 'lucide-react';
 function StudentProgress({ params }) {
   const [student, setStudent] = useState(null);
   const [progress, setProgress] = useState([]);
-  const [questionnaireAnswers, setQuestionnaireAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const studentId = params?.studentId;
 
@@ -29,7 +28,10 @@ function StudentProgress({ params }) {
         .eq('id', studentId)
         .single();
         
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
+      }
       setStudent(profileData);
       
       // Fetch student progress
@@ -39,21 +41,13 @@ function StudentProgress({ params }) {
         .eq('profile_id', studentId)
         .order('date', { ascending: false });
         
-      if (progressError) throw progressError;
-      setProgress(progressData || []);
+      if (progressError) {
+        console.error('Error fetching daily progress:', progressError);
+        throw progressError;
+      }
       
-      // Fetch questionnaire answers
-      const { data: answersData, error: answersError } = await supabase
-        .from('questionnaire_answers')
-        .select(`
-          *,
-          questionnaire:questionnaires(title, description)
-        `)
-        .eq('profile_id', studentId)
-        .order('created_at', { ascending: false });
-        
-      if (answersError) throw answersError;
-      setQuestionnaireAnswers(answersData || []);
+      console.log('Progress data:', progressData); // Pour déboguer
+      setProgress(progressData || []);
       
     } catch (error) {
       console.error('Error fetching student data:', error);
@@ -129,8 +123,10 @@ function StudentProgress({ params }) {
                   <tr>
                     <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                     <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time Spent</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activities Done</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New Expressions</th>
                     <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
-                    <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                    <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">XP Points</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -141,6 +137,19 @@ function StudentProgress({ params }) {
                       </td>
                       <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                         {item.time_spent || 'N/A'}
+                      </td>
+                      <td className="px-4 md:px-6 py-4">
+                        <div className="text-sm text-gray-900">
+                          {item.activities_done ? 
+                            (typeof item.activities_done === 'string' 
+                              ? item.activities_done 
+                              : JSON.stringify(item.activities_done)
+                            ) 
+                            : 'None'}
+                        </div>
+                      </td>
+                      <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                        {item.new_expressions_count || '0'}
                       </td>
                       <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -153,10 +162,8 @@ function StudentProgress({ params }) {
                           {item.confidence_score}/10
                         </span>
                       </td>
-                      <td className="px-4 md:px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-xs lg:max-w-md truncate">
-                          {item.notes || 'No notes'}
-                        </div>
+                      <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                        {item.xp_points || '0'}
                       </td>
                     </tr>
                   ))}
@@ -172,37 +179,53 @@ function StudentProgress({ params }) {
       </div>
 
       <div className="mb-8">
-        <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4">Questionnaire Answers</h2>
-        {questionnaireAnswers.length > 0 ? (
-          <div className="space-y-6">
-            {questionnaireAnswers.map((answer) => (
-              <div key={answer.id} className="bg-white shadow rounded-lg p-4 md:p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {answer.questionnaire?.title || 'Untitled Questionnaire'}
-                </h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  {answer.questionnaire?.description || 'No description'}
-                </p>
-                <p className="text-sm text-gray-500 mb-2">
-                  Completed on: {format(new Date(answer.created_at), 'PPP')}
-                </p>
-                <div className="mt-4 border-t pt-4">
-                  <h4 className="text-md font-medium text-gray-900 mb-2">Answers:</h4>
-                  <div className="space-y-3">
-                    {answer.answers && Object.entries(answer.answers).map(([question, response], idx) => (
-                      <div key={idx} className="bg-gray-50 p-3 rounded-md">
-                        <p className="text-sm font-medium text-gray-700">{question}</p>
-                        <p className="text-sm text-gray-900 mt-1">{response}</p>
-                      </div>
-                    ))}
-                  </div>
+        <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4">Difficulties & Strategies</h2>
+        {progress.length > 0 ? (
+          <div className="bg-white shadow rounded-lg p-4 md:p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">Difficulties</h3>
+                <div className="space-y-2">
+                  {progress.map(item => (
+                    <div key={`diff-${item.id}`} className="p-3 bg-gray-50 rounded-md">
+                      <p className="text-sm text-gray-900">
+                        <span className="font-medium">{item.date ? format(new Date(item.date), 'MMM d, yyyy') : 'N/A'}:</span>
+                        {' '}
+                        {item.difficulties ? 
+                          (typeof item.difficulties === 'string' 
+                            ? item.difficulties 
+                            : JSON.stringify(item.difficulties)
+                          ) 
+                          : 'None reported'}
+                        {item.difficultiesOther && 
+                          `, Other: ${typeof item.difficultiesOther === 'string' 
+                            ? item.difficultiesOther 
+                            : JSON.stringify(item.difficultiesOther)}`
+                        }
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">Overcoming Strategies</h3>
+                <div className="space-y-2">
+                  {progress.map(item => (
+                    <div key={`strat-${item.id}`} className="p-3 bg-gray-50 rounded-md">
+                      <p className="text-sm text-gray-900">
+                        <span className="font-medium">{item.date ? format(new Date(item.date), 'MMM d, yyyy') : 'N/A'}:</span>
+                        {' '}
+                        {item.overcoming_strategies || 'None provided'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="bg-white shadow rounded-lg p-6 text-center text-gray-500">
-            No questionnaire answers available for this student.
+            No data available.
           </div>
         )}
       </div>
