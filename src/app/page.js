@@ -95,7 +95,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Analyse personnalisée</h3>
-              <p className="text-gray-600">Notre technologie d'IA analyse votre niveau, vos forces et vos faiblesses pour créer un parcours d'apprentissage sur mesure.</p>
+              <p className="text-gray-600">Notre technologie dIA analyse votre niveau, vos forces et vos faiblesses pour créer un parcours dapprentissage sur mesure.</p>
             </div>
 
             <div className="bg-indigo-50 p-8 rounded-xl">
@@ -138,7 +138,7 @@ export default function Home() {
             <div className="text-center">
               <div className="w-20 h-20 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">2</div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Plan personnalisé</h3>
-              <p className="text-gray-600">Recevez un programme d'apprentissage adapté à vos objectifs et votre emploi du temps</p>
+              <p className="text-gray-600">Recevez un programme dapprentissage adapté à vos objectifs et votre emploi du temps</p>
             </div>
 
             <div className="text-center">
@@ -199,7 +199,7 @@ export default function Home() {
                   <p className="text-gray-500">Responsable Marketing</p>
                 </div>
               </div>
-              <p className="text-gray-600">"Après seulement 3 mois avec SmartEnglish+, j'ai pu mener ma première réunion entièrement en anglais. Le suivi personnalisé fait toute la différence !"</p>
+              <p className="text-gray-600">Après seulement 3 mois avec SmartEnglish+, jai pu mener ma première réunion entièrement en anglais. Le suivi personnalisé fait toute la différence !</p>
               <div className="mt-4 flex">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -259,7 +259,7 @@ export default function Home() {
                   <p className="text-gray-500">Étudiante</p>
                 </div>
               </div>
-              <p className="text-gray-600">"J'ai réussi mon examen TOEFL avec un score bien supérieur à mon objectif. La méthodologie de SmartEnglish+ est efficace et motivante !"</p>
+              <p className="text-gray-600">Jai réussi mon examen TOEFL avec un score bien supérieur à mon objectif. La méthodologie de SmartEnglish+ est efficace et motivante !</p>
               <div className="mt-4 flex">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -286,7 +286,7 @@ export default function Home() {
             Des formules adaptées à vos besoins
           </h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
-            Choisissez la formule qui correspond à vos objectifs d'apprentissage et à votre budget
+            Choisissez la formule qui correspond à vos objectifs dapprentissage et à votre budget
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -351,7 +351,7 @@ export default function Home() {
                 </li>
               </ul>
               <Link href="/signup" className="block w-full py-3 px-4 bg-white hover:bg-indigo-50 text-indigo-600 font-bold rounded-lg text-center transition">
-                S'inscrire maintenant
+                Sinscrire maintenant
               </Link>
             </div>
 
@@ -396,10 +396,10 @@ export default function Home() {
       <section className="py-20 bg-indigo-900">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Prêt à transformer votre apprentissage de l'anglais ?
+            Prêt à transformer votre apprentissage de langlais ?
           </h2>
           <p className="text-xl text-indigo-100 mb-10 max-w-3xl mx-auto">
-            Rejoignez des milliers d'apprenants qui ont déjà amélioré leur niveau d'anglais avec SmartEnglish+. Commencez dès aujourd'hui !
+            Rejoignez des milliers dapprenants qui ont déjà amélioré leur niveau danglais avec SmartEnglish+. Commencez dès aujourdhui !
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
             <Link href="/signup" className="bg-yellow-500 text-indigo-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-400 transition shadow-lg">
@@ -444,7 +444,7 @@ export default function Home() {
               <h4 className="text-white font-bold mb-4">Légal</h4>
               <ul className="space-y-2">
                 <li><Link href="/privacy" className="text-gray-400 hover:text-white transition">Politique de confidentialité</Link></li>
-                <li><Link href="/terms" className="text-gray-400 hover:text-white transition">Conditions d'utilisation</Link></li>
+                <li><Link href="/terms" className="text-gray-400 hover:text-white transition">Conditions dutilisation</Link></li>
                 <li><Link href="/cookies" className="text-gray-400 hover:text-white transition">Politique de cookies</Link></li>
               </ul>
             </div>
