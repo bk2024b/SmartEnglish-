@@ -19,7 +19,8 @@ export default function DailyProgressPage() {
       if (error) {
         console.error('Erreur lors du chargement des réponses :', error);
       } else {
-        setProgressData(data || []);
+          setProgressData(data || []);
+          console.log(data);
       }
       setLoading(false);
     };
