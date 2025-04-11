@@ -18,7 +18,7 @@ export default function DailyProgressPage() {
 
       if (error) {
         console.error('Erreur lors du chargement des réponses :', error);
-      } else {
+      } else { 
           setProgressData(data || []);
           console.log(data);
       }
