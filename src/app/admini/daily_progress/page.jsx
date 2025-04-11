@@ -39,12 +39,14 @@ export default function DailyProgressPage() {
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+          // Mise à jour du tableau avec les bonnes colonnes
             <thead className="bg-gray-200">
               <tr>
                 <th className="py-3 px-4 text-left">Date</th>
-                <th className="py-3 px-4 text-left">User ID</th>
-                <th className="py-3 px-4 text-left">Answer 1</th>
-                <th className="py-3 px-4 text-left">Answer 2</th>
+                <th className="py-3 px-4 text-left">Profile ID</th>
+                <th className="py-3 px-4 text-left">Temps passé</th>
+                <th className="py-3 px-4 text-left">Activités réalisées</th>
+                <th className="py-3 px-4 text-left">Score de confiance</th>
                 <th className="py-3 px-4 text-left">Créé le</th>
               </tr>
             </thead>
@@ -52,9 +54,11 @@ export default function DailyProgressPage() {
               {progressData.map((progress) => (
                 <tr key={progress.id} className="border-b">
                   <td className="py-2 px-4">{progress.date}</td>
-                  <td className="py-2 px-4">{progress.user_id}</td>
-                  <td className="py-2 px-4">{progress.answer1}</td>
-                  <td className="py-2 px-4">{progress.answer2}</td>
+                  <td className="py-2 px-4">{progress.profile_id}</td>
+                  <td className="py-2 px-4">{progress.time_spent}</td>
+                  <td className="py-2 px-4">{typeof progress.activities_done === 'object' ? 
+                      JSON.stringify(progress.activities_done) : progress.activities_done}</td>
+                  <td className="py-2 px-4">{progress.confidence_score}</td>
                   <td className="py-2 px-4">{new Date(progress.created_at).toLocaleString()}</td>
                 </tr>
               ))}
