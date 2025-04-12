@@ -44,30 +44,47 @@ export default function CoachAdminDashboard() {
       
       try {
         if (activeTab === 'daily') {
-          const { data, error } = await supabase
+          // Fixed: Use proper Supabase query chaining
+          let query = supabase
             .from('daily_progress')
-            .select('*')
-            viewMode === 'individual' 
-              ? query.eq('profile_id', selectedProfile)
-              : query // Sans condition pour obtenir toutes les données
+            .select('*');
+          
+          // Only apply the filter if we're in individual view mode
+          if (viewMode === 'individual') {
+            query = query.eq('profile_id', selectedProfile);
+          }
+          
+          const { data, error } = await query;
           if (error) throw error;
           setDailyProgress(data);
         } 
         else if (activeTab === 'weekly') {
-          const { data, error } = await supabase
+          // Fixed: Use proper Supabase query chaining
+          let query = supabase
             .from('weekly_progress')
-            .select('*')
-            .eq(viewMode === 'individual' ? 'profile_id' : '', viewMode === 'individual' ? selectedProfile : '');
-
+            .select('*');
+          
+          // Only apply the filter if we're in individual view mode
+          if (viewMode === 'individual') {
+            query = query.eq('profile_id', selectedProfile);
+          }
+          
+          const { data, error } = await query;
           if (error) throw error;
           setWeeklyProgress(data);
         } 
         else if (activeTab === 'monthly') {
-          const { data, error } = await supabase
+          // Fixed: Use proper Supabase query chaining
+          let query = supabase
             .from('monthly_progress')
-            .select('*')
-            .eq(viewMode === 'individual' ? 'profile_id' : '', viewMode === 'individual' ? selectedProfile : '');
-
+            .select('*');
+          
+          // Only apply the filter if we're in individual view mode
+          if (viewMode === 'individual') {
+            query = query.eq('profile_id', selectedProfile);
+          }
+          
+          const { data, error } = await query;
           if (error) throw error;
           setMonthlyProgress(data);
           console.log('Fetched data:', data);
