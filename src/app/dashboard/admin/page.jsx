@@ -4,6 +4,7 @@ import { supabase } from '../../utils/supabaseClient';
 import ActivityFormPopup from '../../components/ActivityFormPopup';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import ProgressDetailsModal from '@/app/components/ProgressDetailsModal';
+import AudioRecordingsPanel from '@/app/components/AudioRecordingsPanel'; // Importez le composant
 
 // Fonction utilitaire pour parser en toute sécurité
 const safeJsonParse = (jsonString) => {
@@ -31,6 +32,8 @@ export default function CoachAdminDashboard() {
   const [activeTab, setActiveTab] = useState('daily');
   const [viewMode, setViewMode] = useState('individual'); // 'individual' or 'all'
   const [showAnalytics, setShowAnalytics] = useState(false);
+  // Nouvel état pour gérer l'affichage du panneau audio
+  const [showAudioPanel, setShowAudioPanel] = useState(false);
   
   // Ajout des états manquants pour le modal de détails
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -186,6 +189,14 @@ export default function CoachAdminDashboard() {
                 >
                   {showAnalytics ? 'Masquer les analyses' : 'Afficher les analyses'}
                 </button>
+                
+                {/* Nouveau bouton pour afficher le panneau audio */}
+                <button
+                  onClick={() => setShowAudioPanel(!showAudioPanel)}
+                  className="w-full sm:w-auto mt-2 sm:mt-0 bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors"
+                >
+                  {showAudioPanel ? 'Masquer les enregistrements' : 'Afficher les enregistrements audio'}
+                </button>
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-3 md:mt-0">
@@ -220,6 +231,13 @@ export default function CoachAdminDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Audio Recordings Panel */}
+          {showAudioPanel && (
+            <div className="mb-6">
+              <AudioRecordingsPanel />
+            </div>
+          )}
 
           {/* Analytics Section */}
           {showAnalytics && (
