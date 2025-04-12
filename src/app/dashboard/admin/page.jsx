@@ -4,6 +4,21 @@ import { supabase } from '../../utils/supabaseClient';
 import ActivityFormPopup from '../../components/ActivityFormPopup';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+// Fonction utilitaire pour parser en toute sécurité
+const safeJsonParse = (jsonString) => {
+  if (!jsonString) return [];
+  
+  try {
+    // Si c'est déjà un tableau, on le retourne tel quel
+    if (Array.isArray(jsonString)) return jsonString;
+    
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Erreur de parsing JSON:', error);
+    return [];
+  }
+};
+
 export default function CoachAdminDashboard() {
   const [profiles, setProfiles] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
@@ -123,7 +138,7 @@ export default function CoachAdminDashboard() {
         .filter(p => p.profile_id === selectedProfile)
         .map(p => ({
           date: p.date,
-          completed: p.activities_done ? JSON.parse(p.activities_done).length : 0
+          completed: p.activities_done ? safeJsonParse(p.activities_done).length : 0
         }));
     } else {
       // Aggregate data for all learners
@@ -131,7 +146,7 @@ export default function CoachAdminDashboard() {
       
       dailyProgress.forEach(p => {
         if (!dateMap[p.date]) dateMap[p.date] = 0;
-        dateMap[p.date] += p.activities_done ? JSON.parse(p.activities_done).length : 0;
+        dateMap[p.date] += p.activities_done ? safeJsonParse(p.activities_done).length : 0;
       });
 
       return Object.keys(dateMap).map(date => ({
@@ -330,7 +345,7 @@ function DailyProgressTable({ data, viewMode, profiles }) {
               <td className="px-6 py-4 whitespace-nowrap">{item.date}</td>
               <td className="px-6 py-4 whitespace-nowrap">{item.time_spent}</td>
               <td className="px-6 py-4">
-                {item.activities_done ? JSON.parse(item.activities_done).join(', ') : 'Aucune'}
+                {item.activities_done ? safeJsonParse(item.activities_done).join(', ') : 'Aucune'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
