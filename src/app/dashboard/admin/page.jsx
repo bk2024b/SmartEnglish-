@@ -181,11 +181,12 @@ export default function CoachAdminDashboard() {
                 <select
                   value={selectedProfile || ''}
                   onChange={(e) => setSelectedProfile(e.target.value)}
-                  className="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+                  className="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-sm bg-white text-gray-900" // Ajout de text-gray-900 pour le texte
                   disabled={viewMode === 'all'}
+                  style={{ color: 'black' }} // Style inline pour s'assurer que le texte est visible
                 >
                   {profiles.map(profile => (
-                    <option key={profile.id} value={profile.id}>
+                    <option key={profile.id} value={profile.id} style={{ color: 'black' }}>
                       {profile.full_name || `Apprenant ${profile.id.slice(0, 5)}`}
                     </option>
                   ))}
@@ -219,7 +220,7 @@ export default function CoachAdminDashboard() {
                     <BarChart data={prepareConfidenceData()} margin={{ top: 5, right: 20, left: 0, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                       <XAxis dataKey="name" tick={{ fontSize: 12 }} height={60} tickMargin={10} angle={-45} textAnchor="end" />
-                      <YAxis domain={[0, 10]} tick={{ fontSize: 12 }} />
+                      <YAxis domain={[0, 5]} tick={{ fontSize: 12 }} /> {/* Changé de 10 à 5 */}
                       <Tooltip contentStyle={{ fontSize: 14 }} />
                       <Legend wrapperStyle={{ fontSize: 14 }} />
                       <Bar dataKey="score" fill="#8884d8" name="Score de confiance" />
@@ -345,10 +346,10 @@ function DailyProgressTable({ data, viewMode, profiles }) {
                     <div className="h-3 bg-gray-200 rounded-full flex-1 mr-2 overflow-hidden">
                       <div 
                         className="h-3 bg-blue-600 rounded-full" 
-                        style={{ width: `${item.confidence_score * 10}%` }}
+                        style={{ width: `${item.confidence_score * 20}%` }} {/* Modifié pour une échelle sur 5 (multiplié par 20 au lieu de 10) */}
                       ></div>
                     </div>
-                    <span className="font-medium">{item.confidence_score}/10</span>
+                    <span className="font-medium">{item.confidence_score}/5</span> {/* Changé de /10 à /5 */}
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm">
