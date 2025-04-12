@@ -31,6 +31,10 @@ export default function CoachAdminDashboard() {
   const [activeTab, setActiveTab] = useState('daily');
   const [viewMode, setViewMode] = useState('individual'); // 'individual' or 'all'
   const [showAnalytics, setShowAnalytics] = useState(false);
+  
+  // Ajout des états manquants pour le modal de détails
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedProgressData, setSelectedProgressData] = useState(null);
 
   // Fetch all learner profiles
   useEffect(() => {
@@ -109,6 +113,12 @@ export default function CoachAdminDashboard() {
     fetchProgressData();
   }, [selectedProfile, activeTab, viewMode]);
 
+  // Ajout de la fonction manquante pour ouvrir le modal de détails
+  const openDetailsModal = (data) => {
+    setSelectedProgressData(data);
+    setShowDetailsModal(true);
+  };
+
   // Prepare data for analytics charts
   const prepareConfidenceData = () => {
     const data = profiles.map(profile => {
@@ -182,9 +192,9 @@ export default function CoachAdminDashboard() {
                 <select
                   value={selectedProfile || ''}
                   onChange={(e) => setSelectedProfile(e.target.value)}
-                  className="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-sm bg-white text-gray-900" // Ajout de text-gray-900 pour le texte
+                  className="w-full sm:w-auto border border-gray-300 rounded-md px-3 py-2 text-sm bg-white text-gray-900"
                   disabled={viewMode === 'all'}
-                  style={{ color: 'black' }} // Style inline pour s'assurer que le texte est visible
+                  style={{ color: 'black' }}
                 >
                   {profiles.map(profile => (
                     <option key={profile.id} value={profile.id} style={{ color: 'black' }}>
@@ -221,7 +231,7 @@ export default function CoachAdminDashboard() {
                     <BarChart data={prepareConfidenceData()} margin={{ top: 5, right: 20, left: 0, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                       <XAxis dataKey="name" tick={{ fontSize: 12 }} height={60} tickMargin={10} angle={-45} textAnchor="end" />
-                      <YAxis domain={[0, 5]} tick={{ fontSize: 12 }} /> {/* Changé de 10 à 5 */}
+                      <YAxis domain={[0, 5]} tick={{ fontSize: 12 }} />
                       <Tooltip contentStyle={{ fontSize: 14 }} />
                       <Legend wrapperStyle={{ fontSize: 14 }} />
                       <Bar dataKey="score" fill="#8884d8" name="Score de confiance" />
@@ -281,13 +291,28 @@ export default function CoachAdminDashboard() {
               ) : (
                 <div className="overflow-x-auto">
                   {activeTab === 'daily' && (
-                    <DailyProgressTable data={dailyProgress} viewMode={viewMode} profiles={profiles} />
+                    <DailyProgressTable 
+                      data={dailyProgress} 
+                      viewMode={viewMode} 
+                      profiles={profiles} 
+                      onViewDetails={openDetailsModal}
+                    />
                   )}
                   {activeTab === 'weekly' && (
-                    <WeeklyProgressTable data={weeklyProgress} viewMode={viewMode} profiles={profiles} />
+                    <WeeklyProgressTable 
+                      data={weeklyProgress} 
+                      viewMode={viewMode} 
+                      profiles={profiles} 
+                      onViewDetails={openDetailsModal}
+                    />
                   )}
                   {activeTab === 'monthly' && (
-                    <MonthlyProgressTable data={monthlyProgress} viewMode={viewMode} profiles={profiles} />
+                    <MonthlyProgressTable 
+                      data={monthlyProgress} 
+                      viewMode={viewMode} 
+                      profiles={profiles} 
+                      onViewDetails={openDetailsModal}
+                    />
                   )}
                 </div>
               )}
@@ -303,6 +328,7 @@ export default function CoachAdminDashboard() {
           onClose={() => setShowActivityPopup(false)} 
         />
       )}
+
       {/* Details Modal */}
       {showDetailsModal && selectedProgressData && (
         <ProgressDetailsModal
@@ -317,7 +343,7 @@ export default function CoachAdminDashboard() {
 }
 
 // Component for Daily Progress Table
-function DailyProgressTable({ data, viewMode, profiles }) {
+function DailyProgressTable({ data, viewMode, profiles, onViewDetails }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -349,7 +375,11 @@ function DailyProgressTable({ data, viewMode, profiles }) {
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-800">{item.date}</td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-800">{item.time_spent}</td>
                 <td className="px-4 py-4 text-sm text-gray-800">
-                  {item.activities_done ? safeJsonParse(item.activities_done).join(', ') : 'Aucune'}
+                  {item.activities_done ? 
+                    safeJsonParse(item.activities_done).slice(0, 2).join(', ') + 
+                    (safeJsonParse(item.activities_done).length > 2 ? ' ...' : '') : 
+                    'Aucune'
+                  }
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-800">
                   <div className="flex items-center">
@@ -359,11 +389,14 @@ function DailyProgressTable({ data, viewMode, profiles }) {
                         style={{ width: `${item.confidence_score * 20}%` }} 
                       ></div>
                     </div>
-                    <span className="font-medium">{item.confidence_score}/5</span> {/* Changé de /10 à /5 */}
+                    <span className="font-medium">{item.confidence_score}/5</span>
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors" onClick={() => onViewDetails(item)}>
+                  <button 
+                    className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                    onClick={() => onViewDetails(item)}
+                  >
                     Détails
                   </button>
                 </td>
@@ -377,7 +410,7 @@ function DailyProgressTable({ data, viewMode, profiles }) {
 }
 
 // Component for Weekly Progress Table
-function WeeklyProgressTable({ data, viewMode, profiles }) {
+function WeeklyProgressTable({ data, viewMode, profiles, onViewDetails }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -413,7 +446,10 @@ function WeeklyProgressTable({ data, viewMode, profiles }) {
                 <td className="px-4 py-4 text-sm text-gray-800">{item.biggest_progress}</td>
                 <td className="px-4 py-4 text-sm text-gray-800">{item.biggest_challenge}</td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                  <button 
+                    className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                    onClick={() => onViewDetails(item)}
+                  >
                     Détails
                   </button>
                 </td>
@@ -427,7 +463,7 @@ function WeeklyProgressTable({ data, viewMode, profiles }) {
 }
 
 // Component for Monthly Progress Table
-function MonthlyProgressTable({ data, viewMode, profiles }) {
+function MonthlyProgressTable({ data, viewMode, profiles, onViewDetails }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -461,7 +497,10 @@ function MonthlyProgressTable({ data, viewMode, profiles }) {
                 <td className="px-4 py-4 text-sm text-gray-800">{item.changes_noticed || 'Non spécifié'}</td>
                 <td className="px-4 py-4 text-sm text-gray-800">{item.biggest_monthly_challenge || 'Non spécifié'}</td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                  <button 
+                    className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                    onClick={() => onViewDetails(item)}
+                  >
                     Détails
                   </button>
                 </td>
