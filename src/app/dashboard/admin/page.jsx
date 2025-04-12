@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import ActivityFormPopup from '../../components/ActivityFormPopup';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import ProgressDetailsModal from '@/app/components/ProgressDetailsModal';
 
 // Fonction utilitaire pour parser en toute sécurité
 const safeJsonParse = (jsonString) => {
@@ -302,6 +303,15 @@ export default function CoachAdminDashboard() {
           onClose={() => setShowActivityPopup(false)} 
         />
       )}
+      {/* Details Modal */}
+      {showDetailsModal && selectedProgressData && (
+        <ProgressDetailsModal
+          isOpen={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+          data={selectedProgressData}
+          progressType={activeTab}
+        />
+      )}
     </div>
   );
 }
@@ -353,7 +363,7 @@ function DailyProgressTable({ data, viewMode, profiles }) {
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                  <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors" onClick={() => onViewDetails(item)}>
                     Détails
                   </button>
                 </td>
