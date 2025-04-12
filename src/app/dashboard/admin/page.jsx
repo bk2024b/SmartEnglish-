@@ -346,7 +346,7 @@ function DailyProgressTable({ data, viewMode, profiles }) {
                     <div className="h-3 bg-gray-200 rounded-full flex-1 mr-2 overflow-hidden">
                       <div 
                         className="h-3 bg-blue-600 rounded-full" 
-                        style={{ width: `${item.confidence_score * 20}%` }} {/* Modifié pour une échelle sur 5 (multiplié par 20 au lieu de 10) */}
+                        style={{ width: `${item.confidence_score * 20}%` }} 
                       ></div>
                     </div>
                     <span className="font-medium">{item.confidence_score}/5</span> {/* Changé de /10 à /5 */}
