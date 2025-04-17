@@ -131,6 +131,7 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
                         checked={formData.time_spent === "Moins de 30 min"}
                         onChange={handleChange}
                         className="w-4 h-4 text-blue-500"
+                        required
                       />
                       <span className="text-gray-300">Moins de 30 min</span>
                     </label>
@@ -182,6 +183,7 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
                         checked={formData.activities_done.includes("Écoute immersive")}
                         onChange={handleChange}
                         className="w-4 h-4 text-blue-500"
+                        required
                       />
                       <span className="text-gray-300">Écoute immersive (podcasts, dialogues, vidéos)</span>
                     </label>
@@ -244,6 +246,7 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
                         checked={formData.new_expressions_count === "1-2"}
                         onChange={handleChange}
                         className="w-4 h-4 text-blue-500"
+                        required  
                       />
                       <span className="text-gray-300">1-2</span>
                     </label>
@@ -284,6 +287,7 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
                         checked={formData.difficulties.includes("Compréhension orale")}
                         onChange={handleChange}
                         className="w-4 h-4 text-blue-500"
+                        required
                       />
                       <span className="text-gray-300">Compréhension orale</span>
                     </label>
@@ -353,6 +357,7 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
                     onChange={handleChange}
                     placeholder="Décrivez brièvement..."
                     className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none transition-colors h-24 resize-none"
+                    required
                   ></textarea>
                 </div>
                 
@@ -377,6 +382,7 @@ export default function DailyReportPopup({ isOpen, onClose, userId }) {
                           checked={formData.confidence_score === score.toString()}
                           onChange={handleChange}
                           className="hidden"
+                          required
                         />
                         <span className="text-2xl mb-1">
                           {score === 1 ? '😔' : 
